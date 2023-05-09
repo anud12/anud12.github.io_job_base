@@ -2,14 +2,12 @@ mod api;
 mod implementation;
 mod printable;
 
-pub use implementation::google_session::GoogleSession as GoogleSession;
-
-// pub type GoogleSession = implementation::google_session::GoogleSession;
-pub use  api::file::FileMetadata as FileMetadata;
-pub use  api::file::FolderQuery as FolderQuery;
-pub use  api::file::RootQuery as RootQuery;
-pub use  printable::Printable as Printable;
-pub use  printable::PrintableAnd as PrintableAnd;
+pub use crate::implementation::google_session::GoogleSession as GoogleSession;
+pub use crate::api::file::FileMetadata as FileMetadata;
+pub use crate::api::file::FolderQuery as FolderQuery;
+pub use crate::api::file::RootQuery as RootQuery;
+pub use crate::printable::Printable as Printable;
+pub use crate::printable::PrintableAnd as PrintableAnd;
 
 #[cfg(test)]
 mod tests {
