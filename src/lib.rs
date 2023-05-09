@@ -2,7 +2,7 @@ mod api;
 mod implementation;
 mod printable;
 
-pub type GoogleSession = implementation::GoogleSession;
+pub type GoogleSession = implementation::google_session::GoogleSession;
 pub type FileMetadata = dyn api::file::FileMetadata;
 pub type FolderQuery<ChildQuery> = dyn api::file::FolderQuery<ChildQuery>;
 pub type RootQuery<ChildQuery> = dyn api::file::RootQuery<ChildQuery>;
@@ -13,8 +13,8 @@ pub type PrintableAnd = dyn printable::PrintableAnd;
 mod tests {
     use std::error::Error;
     use crate::api::file::{FileMetadata, FolderQuery, RootQuery};
-    use crate::implementation::GoogleSession;
-    use super::*;
+    use crate::GoogleSession;
+    use crate::printable::Printable;
 
     #[test]
     fn it_works() -> Result<(), Box<dyn Error>> {
@@ -27,7 +27,7 @@ mod tests {
         let client_email = "";
         let global_fs = GoogleSession::new(client_email, private_key)?.drive();
         let boxes = global_fs.find_one_by_name("boxes")?;
-        let boxes_trash = global_fs.find_one_by_name("boxes_trash")?;
+        let _boxes_trash = global_fs.find_one_by_name("boxes_trash")?;
         let first = boxes.find_by_name("first.json")?.remove(0);
 
         first.get_body_json().print();
