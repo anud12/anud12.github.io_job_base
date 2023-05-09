@@ -1,10 +1,7 @@
-use crate::api::file::RootQuery;
+use crate::{api::file::RootQuery, GoogleSession};
 use std::error::Error;
 
-use super::{
-    google_drive_file::GoogleDriveFile, google_session::GoogleSession,
-    prepare_request::prepare_request,
-};
+use super::{google_drive_file::GoogleDriveFile, google_drive_request::prepare_request};
 
 #[derive(Debug)]
 pub struct GoogleDrive {

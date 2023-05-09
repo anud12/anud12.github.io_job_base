@@ -1,15 +1,18 @@
 use std::error::Error;
 
-use crate::api::file::{FileMetadata, FolderQuery};
-
-use super::{google_session::GoogleSession, prepare_request::prepare_request};
-
+use crate::{
+    api::file::{FileMetadata, FolderQuery},
+    GoogleSession,
+};
 use serde::{Deserialize, Serialize};
+
+use super::google_drive_request::prepare_request;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum FileDataMimeType {
     JSON,
     Folder,
+    DB,
     Unknown(String),
 }
 
@@ -21,6 +24,7 @@ where
     match s.as_str() {
         "application/json" => Ok(FileDataMimeType::JSON),
         "application/vnd.google-apps.folder" => Ok(FileDataMimeType::Folder),
+        "application/vnd.google-apps.spreadsheet" => Ok(FileDataMimeType::DB),
         _ => Err(serde::de::Error::custom(format!(
             "unknown mime type: {}",
             s
@@ -78,7 +82,7 @@ impl FileMetadata for GoogleDriveFile {
         Ok(())
     }
 
-    fn get_body_json(&self) -> Result<serde_json::Value, Box<dyn Error>> {
+    fn into_json(&self) -> Result<serde_json::Value, Box<dyn Error>> {
         let response: serde_json::Value = ureq::get(
             format!(
                 "https://www.googleapis.com/drive/v3/files/{}?alt=media",
@@ -93,7 +97,7 @@ impl FileMetadata for GoogleDriveFile {
         Ok(response)
     }
 
-    fn get_body_string(&self) -> Result<String, Box<dyn Error>> {
+    fn into_string(&self) -> Result<String, Box<dyn Error>> {
         let response: String = ureq::get(
             format!(
                 "https://www.googleapis.com/drive/v3/files/{}?alt=media",
@@ -125,5 +129,8 @@ impl FolderQuery<GoogleDriveFile> for GoogleDriveFile {
 impl GoogleDriveFile {
     pub fn new(session: GoogleSession, file_data: FileData) -> GoogleDriveFile {
         GoogleDriveFile { session, file_data }
+    }
+    pub fn get_session(&self) -> GoogleSession {
+        self.session.clone()
     }
 }
