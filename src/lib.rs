@@ -2,12 +2,14 @@ mod api;
 mod implementation;
 mod printable;
 
-pub type GoogleSession = implementation::google_session::GoogleSession;
-pub type FileMetadata = dyn api::file::FileMetadata;
-pub type FolderQuery<ChildQuery> = dyn api::file::FolderQuery<ChildQuery>;
-pub type RootQuery<ChildQuery> = dyn api::file::RootQuery<ChildQuery>;
-pub type Printable = dyn printable::Printable;
-pub type PrintableAnd = dyn printable::PrintableAnd;
+pub use implementation::google_session::GoogleSession as GoogleSession;
+
+// pub type GoogleSession = implementation::google_session::GoogleSession;
+pub use  api::file::FileMetadata as FileMetadata;
+pub use  api::file::FolderQuery as FolderQuery;
+pub use  api::file::RootQuery as RootQuery;
+pub use  printable::Printable as Printable;
+pub use  printable::PrintableAnd as PrintableAnd;
 
 #[cfg(test)]
 mod tests {
