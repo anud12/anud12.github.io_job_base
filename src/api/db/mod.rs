@@ -15,6 +15,7 @@ pub trait IntoTable<TableType: Table> {
 pub trait Table {
     fn query(&self, query: TableQuery) -> Result<Vec<Vec<String>>, Box<dyn Error>>;
     fn get_columns(&self) -> Result<Vec<String>, Box<dyn Error>>;
+    fn persist(&self, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>>;
     fn save_all(&self, data: Vec<serde_json::Value>) -> Result<(), Box<dyn Error>> {
         let column = self.get_columns()?;
         let mut column = column.iter().enumerate().fold(
@@ -52,9 +53,7 @@ pub trait Table {
                 )
             })
             .collect();
-
-        data.print_pre("Data");
-        Ok(())
+        self.persist(data)
     }
     fn find(&self, query: TableQuery) -> Result<Vec<serde_json::Value>, Box<dyn Error>> {
         let columns = self.get_columns()?;

@@ -1,7 +1,7 @@
 mod google_sheet_request;
 
-use std::{error::Error, str::FromStr};
 use std::ops::Index;
+use std::{error::Error, str::FromStr};
 
 use rsa::rand_core::le;
 use serde::{de::DeserializeOwned, Serialize};
@@ -61,7 +61,12 @@ impl Table for Sheet {
                 row.remove(0);
                 row.insert(0, "row_number".to_string());
                 Ok(row)
-            },
+            }
         }
+    }
+
+    fn persist(&self, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>> {
+        data.print_pre("Persist");
+        Ok(())
     }
 }
