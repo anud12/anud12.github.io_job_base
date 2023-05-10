@@ -38,7 +38,7 @@ mod tests_sheet {
 
     use crate::{
         api::db::{IntoTable, Table, TableQuery},
-        FileMetadata, FolderQuery, GoogleSession, Printable, RootQuery,
+        FileMetadata, FolderQuery, GoogleSession, Printable, PrintableAnd, RootQuery,
     };
 
     #[test]
@@ -52,7 +52,8 @@ mod tests_sheet {
         let db = global_fs.find_one_by_name("demo.db")?.into_table();
         let mut query = TableQuery::default();
         query.size = 10.into();
-        db.find(query)?.print_pre("Data");
+        let data = db.find(query)?.print_pre_and("Data");
+        db.save_all(data)?;
         Ok(())
     }
 }

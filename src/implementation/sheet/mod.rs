@@ -1,6 +1,7 @@
 mod google_sheet_request;
 
 use std::{error::Error, str::FromStr};
+use std::ops::Index;
 
 use rsa::rand_core::le;
 use serde::{de::DeserializeOwned, Serialize};
@@ -55,7 +56,12 @@ impl Table for Sheet {
         )?;
         match result.len() {
             0 => Err("No header present".into()),
-            _ => Ok(result.remove(0)),
+            _ => {
+                let mut row = result.remove(0);
+                row.remove(0);
+                row.insert(0, "row_number".to_string());
+                Ok(row)
+            },
         }
     }
 }

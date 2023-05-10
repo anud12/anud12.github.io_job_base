@@ -8,6 +8,7 @@ pub fn prepare_request(
     query: TableQuery,
     get_headers: bool,
 ) -> Result<Vec<Vec<String>>, Box<dyn Error>> {
+    let query_skip = query.skip.or(1.into()).unwrap();
     let url = match get_headers {
         true => format!(
             "https://sheets.googleapis.com/v4/spreadsheets/{}/values/Sheet1!1:1",
@@ -20,7 +21,7 @@ pub fn prepare_request(
             );
             let url = match query.size {
                 Some(size) => {
-                    let skip = query.skip.or(1.into()).unwrap();
+                    let skip = query_skip;
                     let skip = skip + 1;
                     format!("{}/Sheet1!{}:{}", url, skip, size)
                 }
@@ -44,11 +45,15 @@ pub fn prepare_request(
 
     let value: Vec<Vec<String>> = header
         .iter()
-        .map(|row| {
+        .enumerate()
+        .map(|(index, row)| {
             let row = row.as_array().expect("Row to be array");
-            row.iter()
+            let mut row: Vec<String> = row.iter()
                 .map(|cell| cell.as_str().expect("cell to be string").into())
-                .collect()
+                .collect();
+            let index:u64 = u64::try_from(index).expect("Transfrom index from usize to u64");
+            row.insert(0, (index + query_skip).to_string());
+            row
         })
         .collect();
     Ok(value)
