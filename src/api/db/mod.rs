@@ -1,5 +1,7 @@
 use std::{collections::HashMap, error::Error};
 
+use crate::Printable;
+
 #[derive(Default)]
 pub struct TableQuery {
     pub size: Option<u64>,
@@ -37,15 +39,14 @@ pub trait Table {
                                 column.get(key).unwrap()
                             }
                         };
-
-                        acc.insert(index.clone(), value.to_string());
+                        acc.insert(index.clone(), value.as_str().unwrap().to_string());
                         acc
                     },
                 );
                 map.iter().fold(
-                    vec!["".to_string(); column.len()],
+                    vec![String::new(); column.len()],
                     |mut acc, (index, value)| {
-                        acc[index.clone()] = value.to_string();
+                        acc[index.clone()] = value.clone();
                         acc
                     },
                 )

@@ -36,6 +36,8 @@ mod tests_drive {
 mod tests_sheet {
     use std::error::Error;
 
+    use serde_json::json;
+
     use crate::{
         api::db::{IntoTable, Table, TableQuery},
         FileMetadata, FolderQuery, GoogleSession, Printable, PrintableAnd, RootQuery,
@@ -47,12 +49,19 @@ mod tests_sheet {
         let sa_json: serde_json::Value = serde_json::from_str(&sa_file).unwrap();
         let private_key = sa_json["private_key"].as_str().unwrap();
         let client_email = sa_json["client_email"].as_str().unwrap();
-        let global_fs = GoogleSession::new(client_email, private_key)?.into_drive();
 
+        let global_fs = GoogleSession::new(client_email, private_key)?.into_drive();
         let db = global_fs.find_one_by_name("demo.db")?.into_table();
         let mut query = TableQuery::default();
         query.size = 10.into();
-        let data = db.find(query)?;
+        let mut data = db.find(query)?;
+        data.print_pre("data");
+        data.push(json!({
+            "nume":"Ionel",
+            "prenume": "Popsescu",
+            "addresa": "312",
+            "oras": "Tulcea"
+        }));
         db.save_all(data)?;
         Ok(())
     }

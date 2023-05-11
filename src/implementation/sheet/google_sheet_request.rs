@@ -1,5 +1,7 @@
 use std::error::Error;
 
+use serde_json::json;
+
 use crate::api::db::TableQuery;
 
 pub fn prepare_request(
@@ -39,8 +41,11 @@ pub fn prepare_request(
     let rows = response
         .as_object()
         .expect("response should be object")
-        .get("values")
-        .expect("response should have range");
+        .get("values");
+    let rows = match rows {
+        Some(e) => e.clone(),
+        None => json!([]),
+    };
     let header = rows.as_array().expect("Rows should be array");
 
     let value: Vec<Vec<String>> = header
@@ -48,10 +53,11 @@ pub fn prepare_request(
         .enumerate()
         .map(|(index, row)| {
             let row = row.as_array().expect("Row to be array");
-            let mut row: Vec<String> = row.iter()
+            let mut row: Vec<String> = row
+                .iter()
                 .map(|cell| cell.as_str().expect("cell to be string").into())
                 .collect();
-            let index:u64 = u64::try_from(index).expect("Transfrom index from usize to u64");
+            let index: u64 = u64::try_from(index).expect("Transfrom index from usize to u64");
             row.insert(0, (index + query_skip).to_string());
             row
         })
