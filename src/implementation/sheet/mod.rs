@@ -69,8 +69,10 @@ impl Table for Sheet {
 
     fn persist(&self, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>> {
         let mut data = data.clone();
-        let data: Vec<serde_json::Value> = data
+
+        let persisted_data: Vec<serde_json::Value> = data
             .iter()
+            .filter(|e| e.get(0).is_some())
             .map(|e| {
                 let mut row = e.clone();
                 let row_number = row.remove(0).replace("\"", "");
@@ -82,23 +84,55 @@ impl Table for Sheet {
             })
             .collect();
 
-        let body = json!({
-            "valueInputOption": "RAW",
-            "data":data,
-            "includeValuesInResponse": false,
-            "responseValueRenderOption": "UNFORMATTED_VALUE",
-            "responseDateTimeRenderOption": "FORMATTED_STRING",
-        });
+        if persisted_data.len() > 0 {
+            let body = json!({
+                "valueInputOption": "RAW",
+                "data":persisted_data,
+                "includeValuesInResponse": false,
+                "responseValueRenderOption": "UNFORMATTED_VALUE",
+                "responseDateTimeRenderOption": "FORMATTED_STRING",
+            });
 
-        body.print_pre("Body");
+            body.print_pre("Body");
 
-        let url = "https://sheets.googleapis.com/v4/spreadsheets";
-        let url = format!("{}/{}", url, self.spreadsheet_id);
-        let url = format!("{}/values:batchUpdate", url);
-        let request = ureq::post(&url)
-            .set("Authorization", &format!("Bearer {}", self.session.token))
-            .send_json(body);
-        request.print_pre("Result");
+            let url = "https://sheets.googleapis.com/v4/spreadsheets";
+            let url = format!("{}/{}", url, self.spreadsheet_id);
+            let url = format!("{}/values:batchUpdate", url);
+            ureq::post(&url)
+                .set("Authorization", &format!("Bearer {}", self.session.token))
+                .send_json(body)?;
+        }
+
+        let new_data: Vec<serde_json::Value> = data
+            .iter()
+            .filter(|e| e.get(0).is_none())
+            .map(|e| {
+                let mut row = e.clone();
+                let row_number = row.remove(0).replace("\"", "");
+                json!({
+                    "range": "Sheet1",
+                    "majorDimension": "ROWS",
+                    "values": [row],
+                })
+            })
+            .collect();
+        if (new_data.len() > 0) {
+            let body = json!({
+                "valueInputOption": "RAW",
+                "data":new_data,
+                "includeValuesInResponse": false,
+                "responseValueRenderOption": "UNFORMATTED_VALUE",
+                "responseDateTimeRenderOption": "FORMATTED_STRING",
+            });
+
+            let url = "https://sheets.googleapis.com/v4/spreadsheets";
+            let url = format!("{}/{}", url, self.spreadsheet_id);
+            let url = format!("{}/values/Sheet1:append", url);
+            ureq::post(&url)
+                .set("Authorization", &format!("Bearer {}", self.session.token))
+                .send_json(body)?;
+        }
+
         Ok(())
     }
 }
