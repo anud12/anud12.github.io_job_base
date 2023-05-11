@@ -1,10 +1,12 @@
 mod google_sheet_request;
 
+use std::fmt::format;
 use std::ops::Index;
 use std::{error::Error, str::FromStr};
 
 use rsa::rand_core::le;
 use serde::{de::DeserializeOwned, Serialize};
+use serde_json::json;
 
 use crate::{
     api::db::{IntoTable, Table, TableQuery},
@@ -66,7 +68,37 @@ impl Table for Sheet {
     }
 
     fn persist(&self, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>> {
-        data.print_pre("Persist");
+        let mut data = data.clone();
+        let data: Vec<serde_json::Value> = data
+            .iter()
+            .map(|e| {
+                let mut row = e.clone();
+                let row_number = row.remove(0).replace("\"", "");
+                json!({
+                    "range": format!("Sheet1!{}:{}", row_number, row_number),
+                    "majorDimension": "ROWS",
+                    "values": [row],
+                })
+            })
+            .collect();
+
+        let body = json!({
+            "valueInputOption": "RAW",
+            "data":data,
+            "includeValuesInResponse": false,
+            "responseValueRenderOption": "UNFORMATTED_VALUE",
+            "responseDateTimeRenderOption": "FORMATTED_STRING",
+        });
+
+        body.print_pre("Body");
+
+        let url = "https://sheets.googleapis.com/v4/spreadsheets";
+        let url = format!("{}/{}", url, self.spreadsheet_id);
+        let url = format!("{}/values:batchUpdate", url);
+        let request = ureq::post(&url)
+            .set("Authorization", &format!("Bearer {}", self.session.token))
+            .send_json(body);
+        request.print_pre("Result");
         Ok(())
     }
 }

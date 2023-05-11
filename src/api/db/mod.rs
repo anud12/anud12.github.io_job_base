@@ -1,7 +1,5 @@
 use std::{collections::HashMap, error::Error};
 
-use crate::Printable;
-
 #[derive(Default)]
 pub struct TableQuery {
     pub size: Option<u64>,
@@ -58,11 +56,9 @@ pub trait Table {
     fn find(&self, query: TableQuery) -> Result<Vec<serde_json::Value>, Box<dyn Error>> {
         let columns = self.get_columns()?;
         let data = self.query(query)?;
-        data.print();
         let data = data
             .iter()
             .map(|row| {
-                row.print_pre("Row data");
                 let map = columns.iter().enumerate().fold(
                     HashMap::<String, String>::new(),
                     |mut acc, (index, key)| {
@@ -75,7 +71,6 @@ pub trait Table {
                         acc
                     },
                 );
-                map.print_pre("Map data");
                 serde_json::to_value(map).expect("serialize map")
             })
             .collect();

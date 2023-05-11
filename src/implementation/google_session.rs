@@ -25,7 +25,7 @@ impl GoogleSession {
         let expiration_unix_seconds = now + 3600;
         let claims = json!({
             "iss": client_email.into(),
-            "scope": "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive", // change this to the scope you need
+            "scope": "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets", // change this to the scope you need
             "aud": "https://oauth2.googleapis.com/token",
             "exp": now + 3600,
             "iat": now

@@ -7,10 +7,10 @@ pub trait Printable {
 
 impl<T: Debug> Printable for T {
     fn print(&self) {
-        println!("{:?}", &self);
+        println!("{:#?}", &self);
     }
     fn print_pre(&self, string: &str) {
-        println!("{}{:?}", string, &self);
+        println!("{}: {:#?}", string, &self);
     }
 }
 
