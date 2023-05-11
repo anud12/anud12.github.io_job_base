@@ -15,10 +15,10 @@ pub trait IntoTable<TableType: Table> {
 pub trait Table {
     fn query(&self, query: TableQuery) -> Result<Vec<Vec<String>>, Box<dyn Error>>;
     fn get_columns(&self) -> Result<Vec<String>, Box<dyn Error>>;
-    fn persist(&self, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>>;
+    fn persist(&self, columns: Vec<String>, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>>;
     fn save_all(&self, data: Vec<serde_json::Value>) -> Result<(), Box<dyn Error>> {
-        let column = self.get_columns()?;
-        let mut column = column.iter().enumerate().fold(
+        let columns = self.get_columns()?;
+        let mut column_map = columns.iter().enumerate().fold(
             HashMap::<String, usize>::new(),
             |mut acc, (index, value)| {
                 acc.insert(value.to_string(), index);
@@ -31,12 +31,12 @@ pub trait Table {
                 let map = row.as_object().unwrap().iter().fold(
                     HashMap::<usize, String>::new(),
                     |mut acc, (key, value)| {
-                        let index = match column.get(key) {
+                        let index = match column_map.get(key) {
                             Some(value) => value,
                             None => {
-                                let index = column.len();
-                                column.insert(key.to_string(), index);
-                                column.get(key).unwrap()
+                                let index = column_map.len();
+                                column_map.insert(key.to_string(), index);
+                                column_map.get(key).unwrap()
                             }
                         };
                         acc.insert(index.clone(), value.as_str().unwrap().to_string());
@@ -44,7 +44,7 @@ pub trait Table {
                     },
                 );
                 map.iter().fold(
-                    vec![String::new(); column.len()],
+                    vec![String::new(); column_map.len()],
                     |mut acc, (index, value)| {
                         acc[index.clone()] = value.clone();
                         acc
@@ -52,7 +52,14 @@ pub trait Table {
                 )
             })
             .collect();
-        self.persist(data)
+        let columns: Vec<String> =
+            column_map
+                .iter()
+                .fold(vec![String::new(); column_map.len()], |mut acc, value| {
+                    acc[value.1.clone()] = value.0.clone();
+                    acc
+                });
+        self.persist(columns, data)
     }
     fn find(&self, query: TableQuery) -> Result<Vec<serde_json::Value>, Box<dyn Error>> {
         let columns = self.get_columns()?;

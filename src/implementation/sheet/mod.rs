@@ -1,21 +1,12 @@
 mod google_sheet_request;
-
-use std::fmt::format;
-use std::ops::Index;
-use std::{error::Error, str::FromStr};
-
-use rsa::rand_core::le;
-use serde::{de::DeserializeOwned, Serialize};
-use serde_json::json;
-
+use self::google_sheet_request::prepare_request;
+use super::drive::google_drive_file::GoogleDriveFile;
 use crate::{
     api::db::{IntoTable, Table, TableQuery},
-    FileMetadata, GoogleSession, Printable, PrintableAnd,
+    FileMetadata, GoogleSession, Printable,
 };
-
-use self::google_sheet_request::prepare_request;
-
-use super::drive::google_drive_file::GoogleDriveFile;
+use serde_json::json;
+use std::error::Error;
 
 pub struct Sheet {
     session: GoogleSession,
@@ -57,7 +48,7 @@ impl Table for Sheet {
             true,
         )?;
         match result.len() {
-            0 => Err("No header present".into()),
+            0 => Ok(vec![]),
             _ => {
                 let mut row = result.remove(0);
                 row.remove(0);
@@ -67,10 +58,18 @@ impl Table for Sheet {
         }
     }
 
-    fn persist(&self, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>> {
+    fn persist(&self, columns: Vec<String>, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>> {
         let data = data.clone();
+        data.print_pre("Data");
+        let mut columns = columns;
+        columns.remove(0);
+        let column_body = json!({
+            "range": "Sheet1!1:1",
+            "majorDimension": "ROWS",
+            "values": [columns],
+        });
 
-        let persisted_data: Vec<serde_json::Value> = data
+        let mut persisted_data: Vec<serde_json::Value> = data
             .iter()
             .filter(|e| {
                 if e.get(0).is_none() {
@@ -81,7 +80,6 @@ impl Table for Sheet {
             })
             .map(|e| {
                 let mut row = e.clone();
-                row.print_pre("Row");
                 let row_number: u64 = row.remove(0).replace("\"", "").parse().unwrap();
                 let row_number = row_number + 1;
                 json!({
@@ -92,22 +90,21 @@ impl Table for Sheet {
             })
             .collect();
 
-        if persisted_data.len() > 0 {
-            let body = json!({
-                "valueInputOption": "RAW",
-                "data":persisted_data,
-                "includeValuesInResponse": false,
-                "responseValueRenderOption": "UNFORMATTED_VALUE",
-                "responseDateTimeRenderOption": "FORMATTED_STRING",
-            });
+        persisted_data.append(&mut vec![column_body]);
+        let body = json!({
+            "valueInputOption": "RAW",
+            "data":persisted_data,
+            "includeValuesInResponse": false,
+            "responseValueRenderOption": "UNFORMATTED_VALUE",
+            "responseDateTimeRenderOption": "FORMATTED_STRING",
+        });
 
-            let url = "https://sheets.googleapis.com/v4/spreadsheets";
-            let url = format!("{}/{}", url, self.spreadsheet_id);
-            let url = format!("{}/values:batchUpdate", url);
-            ureq::post(&url)
-                .set("Authorization", &format!("Bearer {}", self.session.token))
-                .send_json(body)?;
-        }
+        let url = "https://sheets.googleapis.com/v4/spreadsheets";
+        let url = format!("{}/{}", url, self.spreadsheet_id);
+        let url = format!("{}/values:batchUpdate", url);
+        ureq::post(&url)
+            .set("Authorization", &format!("Bearer {}", self.session.token))
+            .send_json(body)?;
 
         let new_data: Vec<Vec<String>> = data
             .iter()
@@ -124,13 +121,12 @@ impl Table for Sheet {
                 row
             })
             .collect();
-        if (new_data.len() > 0) {
+        if new_data.len() > 0 {
             let body = json!({
-                // "range": "Sheet1",
+                "range": "Sheet1",
                 "majorDimension": "ROWS",
                 "values": new_data,
             });
-            body.print_pre("Body append");
             let url = "https://sheets.googleapis.com/v4/spreadsheets";
             let url = format!("{}/{}", url, self.spreadsheet_id);
             let url = format!("{}/values/Sheet1:append", url);

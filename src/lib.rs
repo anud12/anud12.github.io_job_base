@@ -60,7 +60,10 @@ mod tests_sheet {
             "nume":"Ionel",
             "prenume": "Popsescu",
             "addresa": "312",
-            "oras": "Tulcea"
+            "oras": "Tulcea",
+            "oras2": "Demo",
+            "oras5": "Demo4",
+            "blakey": "blavalue",
         }));
         db.save_all(data)?;
         Ok(())
