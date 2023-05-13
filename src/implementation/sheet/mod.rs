@@ -1,26 +1,19 @@
-mod google_sheet_request;
-use self::google_sheet_request::prepare_request;
+mod get;
+mod parse_response;
+mod save;
 use super::drive::google_drive_file::GoogleDriveFile;
 use crate::{
-    api::db::{IntoTable, Table, TableQuery},
-    FileMetadata, GoogleSession, Printable,
+    api::db::{IntoTable, Table, TableQuery, TableRow},
+    FileMetadata, GoogleSession, PostPrintable,
 };
-use serde_json::json;
-use std::error::Error;
+
+use std::{collections::HashMap, error::Error};
 
 pub struct Sheet {
     session: GoogleSession,
     spreadsheet_id: String,
 }
 
-impl Sheet {
-    pub fn new(session: GoogleSession, spreadsheet_id: String) -> Sheet {
-        Sheet {
-            session,
-            spreadsheet_id,
-        }
-    }
-}
 impl IntoTable<Sheet> for GoogleDriveFile {
     fn into_table(&self) -> Sheet {
         Sheet {
@@ -29,118 +22,97 @@ impl IntoTable<Sheet> for GoogleDriveFile {
         }
     }
 }
+fn transform(
+    row: &TableRow<u64>,
+    column_map: &HashMap<String, usize>,
+) -> (Vec<String>, HashMap<String, usize>) {
+    let mut column_map = column_map.clone();
+    column_map.print_post("Column map");
+    let mut data = row.get_data().clone();
+    let mut existing_rows_list = column_map.iter().fold(
+        vec![String::new(); column_map.len()],
+        |mut acc, (key, value)| {
+            acc[value.clone()] = match data.remove(key) {
+                Some(value) => value,
+                None => "".into(),
+            };
+            acc
+        },
+    );
+    row.get_data().iter().for_each(|(key, value)| {
+        if !column_map.contains_key(&key.to_string()) {
+            column_map.insert(key.to_string(), column_map.len());
+            existing_rows_list.push(value.clone());
+        }
+    });
+    return (existing_rows_list, column_map);
+}
 impl Table for Sheet {
-    fn query(&self, query: TableQuery) -> Result<Vec<Vec<String>>, Box<dyn Error>> {
-        prepare_request(
-            self.session.token.clone(),
-            self.spreadsheet_id.clone(),
-            query,
-            false,
-        )
-    }
-    fn get_columns(&self) -> Result<Vec<String>, Box<dyn Error>> {
-        let mut query = TableQuery::default();
-        query.size = Some(1);
-        let mut result = prepare_request(
-            self.session.token.clone(),
-            self.spreadsheet_id.clone(),
-            query,
-            true,
-        )?;
-        match result.len() {
-            0 => Ok(vec![]),
-            _ => {
-                let mut row = result.remove(0);
-                row.remove(0);
-                row.insert(0, "row_number".to_string());
-                Ok(row)
-            }
-        }
-    }
+    type IdType = u64;
+    fn save_all(&self, data: Vec<TableRow<Self::IdType>>) -> Result<(), Box<dyn Error>> {
+        let columns = get::columns(self)?;
 
-    fn persist(&self, columns: Vec<String>, data: Vec<Vec<String>>) -> Result<(), Box<dyn Error>> {
-        let data = data.clone();
-        data.print_pre("Data");
-        let mut columns = columns;
-        columns.remove(0);
-        let column_body = json!({
-            "range": "Sheet1!1:1",
-            "majorDimension": "ROWS",
-            "values": [columns],
-        });
-
-        let mut persisted_data: Vec<serde_json::Value> = data
-            .iter()
-            .filter(|e| {
-                if e.get(0).is_none() {
-                    return false;
-                }
-                let first = e.get(0);
-                return first.unwrap() != "";
-            })
-            .map(|e| {
-                let mut row = e.clone();
-                let row_number: u64 = row.remove(0).replace("\"", "").parse().unwrap();
-                let row_number = row_number + 1;
-                json!({
-                    "range": format!("Sheet1!{}:{}", row_number, row_number),
-                    "majorDimension": "ROWS",
-                    "values": [row],
-                })
-            })
-            .collect();
-
-        persisted_data.append(&mut vec![column_body]);
-        let body = json!({
-            "valueInputOption": "RAW",
-            "data":persisted_data,
-            "includeValuesInResponse": false,
-            "responseValueRenderOption": "UNFORMATTED_VALUE",
-            "responseDateTimeRenderOption": "FORMATTED_STRING",
-        });
-
-        let url = "https://sheets.googleapis.com/v4/spreadsheets";
-        let url = format!("{}/{}", url, self.spreadsheet_id);
-        let url = format!("{}/values:batchUpdate", url);
-        ureq::post(&url)
-            .set("Authorization", &format!("Bearer {}", self.session.token))
-            .send_json(body)?;
-
-        let new_data: Vec<Vec<String>> = data
-            .iter()
-            .filter(|e| {
-                if e.get(0).is_none() {
-                    return true;
-                }
-                let first = e.get(0);
-                return first.unwrap() == "";
-            })
-            .map(|e| {
-                let mut row = e.clone();
-                row.remove(0);
-                row
-            })
-            .collect();
-        if new_data.len() > 0 {
-            let body = json!({
-                "range": "Sheet1",
-                "majorDimension": "ROWS",
-                "values": new_data,
-            });
-            let url = "https://sheets.googleapis.com/v4/spreadsheets";
-            let url = format!("{}/{}", url, self.spreadsheet_id);
-            let url = format!("{}/values/Sheet1:append", url);
-            let url = format!("{}?", url);
-            let url = format!("{}valueInputOption=RAW", url);
-            let url = format!("{}&insertDataOption=INSERT_ROWS", url);
-            let url = format!("{}&includeValuesInResponse=false", url);
-            let url = format!("{}&responseValueRenderOption=UNFORMATTED_VALUE", url);
-            let url = format!("{}&responseDateTimeRenderOption=FORMATTED_STRING", url);
-            ureq::post(&url)
-                .set("Authorization", &format!("Bearer {}", self.session.token))
-                .send_json(body)?;
-        }
-
+        let mut column_map = columns.iter().enumerate().fold(
+            HashMap::<String, usize>::new(),
+            |mut acc, (index, value)| {
+                acc.insert(value.clone(), index);
+                acc
+            },
+        );
+        let clean_rows = data.iter().filter(|row| row.get_id() == &None).fold(
+            Vec::<Vec<String>>::with_capacity(data.len()),
+            |mut acc, row| {
+                let (row_list, new_column_map) = transform(row, &column_map);
+                column_map = new_column_map;
+                acc.push(row_list);
+                acc
+            },
+        );
+        let mut persisted_rows = data.iter().filter(|row| row.get_id() != &None).fold(
+            Vec::<(Self::IdType, Vec<String>)>::with_capacity(data.len()),
+            |mut acc, row| {
+                let (row_list, new_column_map) = transform(row, &column_map);
+                column_map = new_column_map;
+                acc.push((row.get_id().unwrap(), row_list));
+                acc
+            },
+        );
+        column_map.print_post("Column map");
+        let column_row = column_map.iter().fold(
+            vec![String::new(); column_map.len()],
+            |mut acc, (key, value)| {
+                acc[value.clone()] = key.clone();
+                acc
+            },
+        );
+        persisted_rows.push((0, column_row));
+        save::persisted_rows(self, persisted_rows)?;
+        save::new_rows(self, clean_rows)?;
         Ok(())
+    }
+
+    fn find(&self, query: TableQuery) -> Result<Vec<TableRow<Self::IdType>>, Box<dyn Error>> {
+        let columns = get::columns(&self)?;
+        let data = get::rows(&self, query)?;
+        let data = data
+            .iter()
+            .map(|(id, row)| {
+                let map = columns.iter().enumerate().fold(
+                    HashMap::<String, String>::new(),
+                    |mut acc, (index, key)| {
+                        let value = row.get(index);
+                        if value.is_none() {
+                            return acc;
+                        }
+
+                        acc.insert(key.to_string(), value.unwrap().to_string());
+                        acc
+                    },
+                );
+                TableRow::new_persisted(id.clone(), map)
+            })
+            .collect();
+
+        Ok(data)
     }
 }
