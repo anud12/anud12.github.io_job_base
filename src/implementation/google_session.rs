@@ -14,24 +14,24 @@ pub struct GoogleSession {
 }
 
 impl GoogleSession {
-    pub fn new<T: Into<String>>(
-        client_email: T,
-        private_key: T,
-    ) -> Result<GoogleSession, Box<dyn Error>> {
+    pub fn new() -> Result<GoogleSession, Box<dyn Error>> {
+        let private_key = std::env::var("private_key")?;
+        let client_email = std::env::var("client_email")?;
+
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs();
         let expiration_unix_seconds = now + 3600;
         let claims = json!({
-            "iss": client_email.into(),
+            "iss": client_email,
             "scope": "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets", // change this to the scope you need
             "aud": "https://oauth2.googleapis.com/token",
             "exp": now + 3600,
             "iat": now
         });
         let header = Header::new(Algorithm::RS256);
-        let key = EncodingKey::from_rsa_pem(private_key.into().as_bytes())?;
+        let key = EncodingKey::from_rsa_pem(private_key.as_bytes())?;
         let jwt = encode(&header, &claims, &key)?;
 
         // Send a POST request to get the access token

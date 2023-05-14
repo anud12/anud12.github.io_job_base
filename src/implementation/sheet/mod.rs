@@ -4,7 +4,7 @@ mod save;
 use super::drive::google_drive_file::GoogleDriveFile;
 use crate::{
     api::db::{IntoTable, Table, TableQuery, TableRow},
-    FileMetadata, GoogleSession, PostPrintable,
+    FileMetadata, GoogleSession,
 };
 
 use std::{collections::HashMap, error::Error};
@@ -27,7 +27,6 @@ fn transform(
     column_map: &HashMap<String, usize>,
 ) -> (Vec<String>, HashMap<String, usize>) {
     let mut column_map = column_map.clone();
-    column_map.print_post("Column map");
     let mut data = row.get_data().clone();
     let mut existing_rows_list = column_map.iter().fold(
         vec![String::new(); column_map.len()],
@@ -77,7 +76,6 @@ impl Table for Sheet {
                 acc
             },
         );
-        column_map.print_post("Column map");
         let column_row = column_map.iter().fold(
             vec![String::new(); column_map.len()],
             |mut acc, (key, value)| {
@@ -91,7 +89,10 @@ impl Table for Sheet {
         Ok(())
     }
 
-    fn find(&self, query: TableQuery) -> Result<Vec<TableRow<Self::IdType>>, Box<dyn Error>> {
+    fn find_by_query(
+        &self,
+        query: TableQuery,
+    ) -> Result<Vec<TableRow<Self::IdType>>, Box<dyn Error>> {
         let columns = get::columns(&self)?;
         let data = get::rows(&self, query)?;
         let data = data

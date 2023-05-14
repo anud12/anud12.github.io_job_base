@@ -17,54 +17,44 @@ mod tests_drive {
     use std::error::Error;
 
     #[test]
-    fn it_works() -> Result<(), Box<dyn Error>> {
-        let sa_file = include_str!("service_account.json");
-        let sa_json: serde_json::Value = serde_json::from_str(&sa_file).unwrap();
-        let private_key = sa_json["private_key"].as_str().unwrap();
-        let client_email = sa_json["client_email"].as_str().unwrap();
-        let global_fs = GoogleSession::new(client_email, private_key)?.into_drive();
+    fn drive_works() -> Result<(), Box<dyn Error>> {
+        let global_fs = GoogleSession::new()?.into_drive();
         let boxes = global_fs.find_one_by_name("boxes")?;
         let _boxes_trash = global_fs.find_one_by_name("boxes_trash")?;
         let first = boxes.find_by_name("first.json")?.remove(0);
 
-        first.into_json().print_post("a");
-        global_fs.find_all()?.print_post("b");
+        first.into_json().print("a");
+        global_fs.find_all()?.print("b");
         Ok(())
     }
 }
 
 mod tests_sheet {
-    #[test]
-    fn it_works() -> Result<(), Box<dyn std::error::Error>> {
-        use crate::{
-            api::db::{IntoTable, Table, TableQuery, TableRow},
-            GoogleSession, PostPrintable, RootQuery,
-        };
-        let sa_file = include_str!("service_account.json");
-        let sa_json: serde_json::Value = serde_json::from_str(&sa_file).unwrap();
-        let private_key = sa_json["private_key"].as_str().unwrap();
-        let client_email = sa_json["client_email"].as_str().unwrap();
 
-        let global_fs = GoogleSession::new(client_email, private_key)?.into_drive();
+    #[test]
+    fn sheet_works() -> Result<(), Box<dyn std::error::Error>> {
+        use crate::{
+            api::db::{IntoTable, Table, TableRow},
+            GoogleSession, RootQuery,
+        };
+        let global_fs = GoogleSession::new()?.into_drive();
         let db = global_fs.find_one_by_name("demo.db")?.into_table();
-        let mut query = TableQuery::default();
-        query.size = 100.into();
-        let data = db.find(query)?;
-        data.print_post("data");
+        let data = db.find_by().size(100).query()?;
         let mut data: Vec<TableRow<u64>> = data
             .iter()
             .map(|row| {
                 let key = row.get("blakey").unwrap();
-                row.clone()
-                    .insert("blakey".into(), format!("{}{}", key, " value"))
+                row.clone().insert("blakey", format!("{}{}", key, " value"))
             })
             .collect();
+        let time = std::time::UNIX_EPOCH.elapsed()?;
         data.push(
             TableRow::new()
                 .insert("nume", "Ionel")
                 .insert("prenume", "Popescu")
                 .insert("addresa", "312")
-                .insert("oras", "Tulcea"),
+                .insert("oras", "Tulcea")
+                .insert(time.as_secs().to_string(), "Timed"),
         );
         db.save_all(data)?;
         Ok(())

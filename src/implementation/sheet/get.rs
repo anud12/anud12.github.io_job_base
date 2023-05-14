@@ -5,7 +5,7 @@ use crate::api::db::TableQuery;
 use super::{parse_response::parse_response, Sheet};
 
 pub fn rows(sheet: &Sheet, query: TableQuery) -> Result<Vec<(u64, Vec<String>)>, Box<dyn Error>> {
-    let query_skip = query.skip.or(1.into()).unwrap();
+    let query_skip = query.skip.or(0.into()).unwrap();
     let url = format!(
         "https://sheets.googleapis.com/v4/spreadsheets/{}/values",
         sheet.spreadsheet_id
@@ -23,6 +23,7 @@ pub fn rows(sheet: &Sheet, query: TableQuery) -> Result<Vec<(u64, Vec<String>)>,
     let response = ureq::get(&url)
         .set("Authorization", &format!("Bearer {}", sheet.session.token))
         .call()?;
+
     Ok(parse_response(response, query_skip)?)
 }
 
@@ -36,6 +37,9 @@ pub fn columns(sheet: &Sheet) -> Result<Vec<String>, Box<dyn Error>> {
         .set("Authorization", &format!("Bearer {}", sheet.session.token))
         .call()?;
     let mut body = parse_response(response, 0)?;
+    if body.len() == 0 {
+        return Ok(Vec::new());
+    }
     let (_, column_list) = body.remove(0);
     Ok(column_list)
 }

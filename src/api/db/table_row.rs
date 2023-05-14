@@ -28,7 +28,7 @@ impl<IdType> TableRow<IdType> {
         &self.id
     }
     #[allow(dead_code)]
-    pub fn insert<Value: Into<String>>(mut self, k: &str, v: Value) -> Self {
+    pub fn insert<Key: Into<String>, Value: Into<String>>(mut self, k: Key, v: Value) -> Self {
         self.data.insert(k.into(), v.into());
         self
     }

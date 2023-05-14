@@ -1,5 +1,6 @@
 mod table;
 mod table_query;
+mod table_query_builder;
 mod table_row;
 
 pub use table::IntoTable;
