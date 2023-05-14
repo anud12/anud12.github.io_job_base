@@ -15,8 +15,8 @@ pub struct GoogleSession {
 
 impl GoogleSession {
     pub fn new() -> Result<GoogleSession, Box<dyn Error>> {
-        let private_key = std::env::var("private_key")?;
-        let client_email = std::env::var("client_email")?;
+        let private_key = std::env::var("PRIVATE_KEY").expect("PRIVATE_KEY not set");
+        let client_email = std::env::var("CLIENT_EMAIL").expect("CLIENT_EMAIL not set");
 
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
