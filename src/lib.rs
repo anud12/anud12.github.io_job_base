@@ -13,7 +13,7 @@ pub use crate::printable::PrintableAnd;
 mod tests_drive {
     use crate::api::file::{FolderQuery, RootQuery};
 
-    use crate::{FileMetadata, GoogleSession, PostPrintable};
+    use crate::{FileMetadata, GoogleSession};
     use std::error::Error;
 
     #[test]
