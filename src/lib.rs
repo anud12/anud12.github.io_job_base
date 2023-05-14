@@ -11,20 +11,20 @@ pub use crate::printable::PrintableAnd;
 
 #[cfg(test)]
 mod tests_drive {
-    use crate::api::file::{FileMetadata, FolderQuery, RootQuery};
-    use crate::printable::PostPrintable;
-    use crate::GoogleSession;
+    use crate::api::file::{FolderQuery, RootQuery};
+
+    use crate::{FileMetadata, GoogleSession, PostPrintable};
     use std::error::Error;
 
     #[test]
     fn drive_works() -> Result<(), Box<dyn Error>> {
+        std::env::set_var("PRIVATE_KEY", include_str!("private_key"));
+        std::env::set_var("CLIENT_EMAIL", include_str!("client_email"));
         let global_fs = GoogleSession::new()?.into_drive();
         let boxes = global_fs.find_one_by_name("boxes")?;
         let _boxes_trash = global_fs.find_one_by_name("boxes_trash")?;
-        let first = boxes.find_by_name("first.json")?.remove(0);
-
-        first.into_json().print("a");
-        global_fs.find_all()?.print("b");
+        let mut first = boxes.find_by_name("Copy of first.json")?.remove(0);
+        first.rename("second.json")?;
         Ok(())
     }
 }
@@ -37,6 +37,8 @@ mod tests_sheet {
             api::db::{IntoTable, Table, TableRow},
             GoogleSession, RootQuery,
         };
+        std::env::set_var("PRIVATE_KEY", include_str!("private_key"));
+        std::env::set_var("CLIENT_EMAIL", include_str!("client_email"));
         let global_fs = GoogleSession::new()?.into_drive();
         let db = global_fs.find_one_by_name("demo.db")?.into_table();
         let data = db.find_by().size(100).query()?;

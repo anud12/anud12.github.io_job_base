@@ -1,5 +1,7 @@
 use std::error::Error;
 
+use crate::PostPrintable;
+
 use super::google_drive_file::FileData;
 
 pub fn prepare_request(
@@ -16,7 +18,7 @@ pub fn prepare_request(
     }
     let query = vec.join(" and ");
     let response = ureq::get("https://www.googleapis.com/drive/v3/files")
-        .query("fields", "files(id,name, mimeType, parents, permissions)") // change this to the fields you need
+        .query("fields", "files(id, name, mimeType, parents)") // change this to the fields you need
         .query("q", &query)
         .set("Authorization", &format!("Bearer {}", token))
         .call()?;
@@ -26,6 +28,7 @@ pub fn prepare_request(
         Some(value) => value.to_string(),
         None => return Err(format!("files value does not exist on body {:?}", body).into()),
     };
+    files_string.print("Files string");
     let file_list: Vec<FileData> = serde_json::from_str(&files_string)?;
 
     Ok(file_list)
