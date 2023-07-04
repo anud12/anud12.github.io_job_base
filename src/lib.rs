@@ -3,15 +3,15 @@ mod implementation;
 mod printable;
 
 pub use crate::api::file::FileMetadata;
+pub use crate::api::file::FileQuery;
 pub use crate::api::file::FolderQuery;
-pub use crate::api::file::RootQuery;
 pub use crate::implementation::google_session::GoogleSession;
 pub use crate::printable::PostPrintable;
 pub use crate::printable::PrintableAnd;
 
 #[cfg(test)]
 mod tests_drive {
-    use crate::api::file::{FolderQuery, RootQuery};
+    use crate::api::file::{FileQuery, FolderQuery};
 
     use crate::{FileMetadata, GoogleSession};
     use std::error::Error;
@@ -35,7 +35,7 @@ mod tests_sheet {
     fn sheet_works() -> Result<(), Box<dyn std::error::Error>> {
         use crate::{
             api::db::{IntoTable, Table, TableRow},
-            GoogleSession, RootQuery,
+            FileQuery, GoogleSession,
         };
         std::env::set_var("PRIVATE_KEY", include_str!("private_key"));
         std::env::set_var("CLIENT_EMAIL", include_str!("client_email"));

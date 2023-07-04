@@ -1,10 +1,12 @@
 use std::error::Error;
 
+use crate::FileMetadata;
+
 use super::{folder_query::FolderQuery, request::Request};
 
-pub trait RootQuery<ChildQuery>
+pub trait FileQuery<ChildQuery>
 where
-    ChildQuery: FolderQuery<ChildQuery>,
+    ChildQuery: FolderQuery<ChildQuery> + FileMetadata,
 {
     fn query(&self, query_request: Request) -> Result<Vec<ChildQuery>, Box<dyn Error>>;
     fn find_all(&self) -> Result<Vec<ChildQuery>, Box<dyn Error>> {

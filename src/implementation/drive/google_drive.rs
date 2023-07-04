@@ -1,4 +1,4 @@
-use crate::{api::file::RootQuery, GoogleSession};
+use crate::{api::file::FolderQuery, FileQuery, GoogleSession};
 use std::error::Error;
 
 use super::{google_drive_file::GoogleDriveFile, google_drive_request::prepare_request};
@@ -12,7 +12,7 @@ impl GoogleDrive {
         GoogleDrive { session }
     }
 }
-impl RootQuery<GoogleDriveFile> for GoogleDrive {
+impl FileQuery<GoogleDriveFile> for GoogleDrive {
     fn query(
         &self,
         query_request: crate::api::file::Request,

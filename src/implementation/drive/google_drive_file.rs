@@ -2,12 +2,12 @@ use std::error::Error;
 
 use crate::{
     api::file::{FileMetadata, FolderQuery},
-    GoogleSession,
+    FileQuery, GoogleSession,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use super::google_drive_request::prepare_request;
+use super::{google_drive::GoogleDrive, google_drive_request::prepare_request};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum FileDataMimeType {
@@ -131,16 +131,8 @@ impl FileMetadata for GoogleDriveFile {
     }
 }
 impl FolderQuery<GoogleDriveFile> for GoogleDriveFile {
-    fn query(
-        &self,
-        query_request: crate::api::file::Request,
-    ) -> Result<Vec<GoogleDriveFile>, Box<dyn Error>> {
-        let file_list = prepare_request(self.session.token.clone(), query_request)?;
-        let file_list = file_list
-            .iter()
-            .map(|file| GoogleDriveFile::new(self.session.clone(), file.clone()))
-            .collect();
-        Ok(file_list)
+    fn get_query(&self) -> Box<dyn FileQuery<GoogleDriveFile>> {
+        Box::new(GoogleDrive::new(self.session.clone()))
     }
 }
 
