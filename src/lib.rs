@@ -4,14 +4,13 @@ mod printable;
 
 pub use crate::api::file::FileMetadata;
 pub use crate::api::file::FileQuery;
-pub use crate::api::file::FolderQuery;
 pub use crate::implementation::google_session::GoogleSession;
 pub use crate::printable::PostPrintable;
 pub use crate::printable::PrintableAnd;
 
 #[cfg(test)]
 mod tests_drive {
-    use crate::api::file::{FileQuery, FolderQuery};
+    use crate::api::file::FileQuery;
 
     use crate::{FileMetadata, GoogleSession};
     use std::error::Error;

@@ -1,11 +1,11 @@
-pub struct Request {
+pub struct RequestList {
     pub name: Option<String>,
     pub size: Option<usize>,
     pub fixed: Option<bool>,
     pub parent: Option<String>,
 }
 
-impl Default for Request {
+impl Default for RequestList {
     fn default() -> Self {
         Self {
             name: Default::default(),

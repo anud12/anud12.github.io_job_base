@@ -1,40 +1,31 @@
 use std::error::Error;
 
-use crate::FileMetadata;
+use super::{request_list::RequestList, request_one::RequestOne};
 
-use super::{folder_query::FolderQuery, request::Request};
-
-pub trait FileQuery<ChildQuery>
-where
-    ChildQuery: FolderQuery<ChildQuery> + FileMetadata,
-{
-    fn query(&self, query_request: Request) -> Result<Vec<ChildQuery>, Box<dyn Error>>;
-    fn find_all(&self) -> Result<Vec<ChildQuery>, Box<dyn Error>> {
-        let request = Request::default();
-        let response = self.query(request)?;
+pub trait FileQuery<Return> {
+    fn query_list(&self, query_request: RequestList) -> Result<Vec<Return>, Box<dyn Error>>;
+    fn query_one(&self, query_request: RequestOne) -> Result<Return, Box<dyn Error>>;
+    fn find_all(&self) -> Result<Vec<Return>, Box<dyn Error>> {
+        let request = RequestList::default();
+        let response = self.query_list(request)?;
 
         Ok(response)
     }
 
-    fn find_by_name(&self, name: &str) -> Result<Vec<ChildQuery>, Box<dyn Error>> {
-        let mut request = Request::default();
+    fn find_by_name(&self, name: &str) -> Result<Vec<Return>, Box<dyn Error>> {
+        let mut request = RequestList::default();
         request.name = Some(name.into());
 
-        let response = self.query(request)?;
+        let response = self.query_list(request)?;
 
         Ok(response)
     }
 
-    fn find_one_by_name(&self, name: &str) -> Result<ChildQuery, Box<dyn Error>> {
-        let mut request = Request::default();
+    fn find_one_by_name(&self, name: &str) -> Result<Return, Box<dyn Error>> {
+        let mut request = RequestOne::default();
         request.name = Some(name.into());
         request.size = Some(1);
         request.fixed = Some(true);
-
-        let mut response = self.query(request)?;
-        match response.len() {
-            1 => Ok(response.swap_remove(0)),
-            _ => Err(format!("Invalid retrun in find_one_by_name for '{}'", name).into()),
-        }
+        self.query_one(request)
     }
 }

@@ -6,7 +6,7 @@ use super::google_drive_file::FileData;
 
 pub fn prepare_request(
     token: String,
-    arguments: crate::api::file::Request,
+    arguments: crate::api::file::RequestList,
 ) -> Result<Vec<FileData>, Box<dyn Error>> {
     let mut vec: Vec<String> = vec![];
 
