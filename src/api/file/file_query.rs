@@ -24,8 +24,6 @@ pub trait FileQuery<Return> {
     fn find_one_by_name(&self, name: &str) -> Result<Return, Box<dyn Error>> {
         let mut request = RequestOne::default();
         request.name = Some(name.into());
-        request.size = Some(1);
-        request.fixed = Some(true);
         self.query_one(request)
     }
 }

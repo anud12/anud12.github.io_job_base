@@ -4,7 +4,9 @@ use crate::{api::file::FileMetadata, FileQuery, GoogleSession};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use super::google_drive_query::query;
+use super::{
+    google_drive_query::google_drive_query, google_drive_query_one::google_drive_query_one,
+};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum FileDataMimeType {
@@ -132,14 +134,14 @@ impl FileQuery<GoogleDriveFile> for GoogleDriveFile {
         &self,
         query_request: crate::api::file::RequestList,
     ) -> Result<Vec<GoogleDriveFile>, Box<dyn Error>> {
-        query(&self.session, query_request)
+        google_drive_query(&self.session, query_request)
     }
 
     fn query_one(
         &self,
         query_request: crate::api::file::RequestOne,
     ) -> Result<GoogleDriveFile, Box<dyn Error>> {
-        todo!()
+        google_drive_query_one(&self.session, query_request)
     }
 }
 

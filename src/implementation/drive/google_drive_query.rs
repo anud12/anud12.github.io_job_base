@@ -4,7 +4,7 @@ use crate::GoogleSession;
 
 use super::{google_drive_file::GoogleDriveFile, google_drive_request::prepare_request};
 
-pub fn query(
+pub fn google_drive_query(
     session: &GoogleSession,
     query_request: crate::api::file::RequestList,
 ) -> Result<Vec<GoogleDriveFile>, Box<dyn Error>> {

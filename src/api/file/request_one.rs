@@ -1,7 +1,6 @@
 pub struct RequestOne {
     pub name: Option<String>,
-    pub size: Option<usize>,
-    pub fixed: Option<bool>,
+    pub id: Option<String>,
     pub parent: Option<String>,
 }
 
@@ -9,8 +8,7 @@ impl Default for RequestOne {
     fn default() -> Self {
         Self {
             name: Default::default(),
-            size: Default::default(),
-            fixed: Default::default(),
+            id: Default::default(),
             parent: Default::default(),
         }
     }
