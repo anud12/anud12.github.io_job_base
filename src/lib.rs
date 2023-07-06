@@ -12,7 +12,7 @@ pub use crate::printable::PrintableAnd;
 mod tests_drive {
     use crate::api::file::FileQuery;
 
-    use crate::{FileMetadata, GoogleSession};
+    use crate::{FileMetadata, GoogleSession, PostPrintable};
     use std::error::Error;
 
     #[test]
@@ -24,6 +24,15 @@ mod tests_drive {
         let _boxes_trash = global_fs.find_one_by_name("boxes_trash")?;
         let mut first = boxes.find_by_name("Copy of first.json")?.remove(0);
         first.rename("second.json")?;
+        Ok(())
+    }
+    #[test]
+    fn drive_by_id_works() -> Result<(), Box<dyn Error>> {
+        std::env::set_var("PRIVATE_KEY", include_str!("private_key"));
+        std::env::set_var("CLIENT_EMAIL", include_str!("client_email"));
+        let global_fs = GoogleSession::new()?.into_drive();
+        let boxes = global_fs.find_one_by_id("1Zpve7qvBDIlyTWtzxwoF2zuvaoIPHmg8")?;
+        boxes.print("Boxes");
         Ok(())
     }
 }

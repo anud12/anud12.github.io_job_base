@@ -17,8 +17,8 @@ pub fn google_drive_query_one(
     let file: FileData = match query_request.id {
         Some(value) => {
             let response =
-                ureq::get(format!("https://www.googleapis.com/drive/v3/file/{}", value).as_str())
-                    .query("fields", "files(id, name, mimeType, parents)") // change this to the fields you need
+                ureq::get(format!("https://www.googleapis.com/drive/v3/files/{}", value).as_str())
+                    .query("fields", "id, name, mimeType, parents") // change this to the fields you need
                     .set("Authorization", &format!("Bearer {}", session.token))
                     .call()?;
             response.into_json()?
