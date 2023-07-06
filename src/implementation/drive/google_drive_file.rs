@@ -1,8 +1,7 @@
-use std::error::Error;
-
 use crate::{api::file::FileMetadata, FileQuery, GoogleSession};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::error::Error;
 
 use super::{
     google_drive_query::google_drive_query, google_drive_query_one::google_drive_query_one,
@@ -25,10 +24,7 @@ where
         "application/json" => Ok(FileDataMimeType::JSON),
         "application/vnd.google-apps.folder" => Ok(FileDataMimeType::Folder),
         "application/vnd.google-apps.spreadsheet" => Ok(FileDataMimeType::DB),
-        _ => Err(serde::de::Error::custom(format!(
-            "unknown mime type: {}",
-            s
-        ))),
+        _ => Ok(FileDataMimeType::Unknown(s)),
     }
 }
 
@@ -49,6 +45,7 @@ pub struct GoogleDriveFile {
     file_data: FileData,
 }
 impl FileMetadata for GoogleDriveFile {
+    type File = GoogleDriveFile;
     fn get_id(&self) -> String {
         self.file_data.id.clone()
     }
@@ -127,6 +124,38 @@ impl FileMetadata for GoogleDriveFile {
         }))?;
         self.file_data.name = name;
         Ok(())
+    }
+
+    fn create<Body: Into<String>>(
+        &self,
+        name: &str,
+        content_type: &str,
+        body: Body,
+    ) -> Result<GoogleDriveFile, Box<dyn Error>> {
+        let form_data: String = body.into();
+
+        let id_token = self.session.clone().token;
+
+        let resumable_url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable";
+        let resumable_req: ureq::Response = ureq::post(resumable_url)
+            .set("Authorization", &format!("Bearer {}", id_token))
+            .set("Content-Type", "application/json; charset=UTF-8")
+            .send_json(serde_json::json!({
+                "name": name,
+                "parents": [self.file_data.id],
+                "mimeType": content_type,
+            }))?;
+
+        let location = resumable_req.header("Location").unwrap().to_string();
+
+        let put_req = ureq::put(&location)
+            .set("Authorization", &format!("Bearer {}", id_token))
+            .set("Content-Type", content_type)
+            .set("Content-Length", &form_data.len().to_string())
+            .send_string(&form_data)?;
+
+        let json: serde_json::Value = put_req.into_json()?;
+        self.find_one_by_id(json.get("id").map(|f| f.as_str()).unwrap().unwrap())
     }
 }
 impl FileQuery<GoogleDriveFile> for GoogleDriveFile {

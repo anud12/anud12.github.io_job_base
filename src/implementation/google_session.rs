@@ -7,10 +7,16 @@ use std::{
 
 use super::drive::google_drive::GoogleDrive;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct GoogleSession {
     pub token: String,
     pub expiration_unix_seconds: u64,
+}
+
+impl core::fmt::Debug for GoogleSession {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GoogleSession").finish()
+    }
 }
 
 impl GoogleSession {
