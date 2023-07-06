@@ -56,7 +56,9 @@ mod tests_drive {
                 })
                 .to_string(),
             )?
-            .print_and("File pre move");
+            .print_and("File pre move")
+            .get_link()
+            .print("Link: ");
         Ok(())
     }
 

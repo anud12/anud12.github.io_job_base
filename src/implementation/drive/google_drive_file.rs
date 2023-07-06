@@ -1,7 +1,7 @@
 use crate::{api::file::FileMetadata, FileQuery, GoogleSession};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::error::Error;
+use std::{error::Error, fmt::format};
 
 use super::{
     google_drive_query::google_drive_query, google_drive_query_one::google_drive_query_one,
@@ -52,6 +52,10 @@ impl FileMetadata for GoogleDriveFile {
 
     fn get_name(&self) -> String {
         self.file_data.name.clone()
+    }
+
+    fn get_link(&self) -> String {
+        format!("https://drive.google.com/uc?id={}", self.get_id())
     }
 
     fn into_json(&self) -> Result<serde_json::Value, Box<dyn Error>> {
