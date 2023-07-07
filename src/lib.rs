@@ -123,13 +123,10 @@ mod tests_drive {
 }
 
 mod tests_sheet {
+    use crate::{FileQuery, GoogleSession, IntoTable, Table, TableRow};
 
     #[test]
     fn sheet_works() -> Result<(), Box<dyn std::error::Error>> {
-        use crate::{
-            api::db::{IntoTable, Table, TableRow},
-            FileQuery, GoogleSession,
-        };
         std::env::set_var("PRIVATE_KEY", include_str!("private_key"));
         std::env::set_var("CLIENT_EMAIL", include_str!("client_email"));
         let global_fs = GoogleSession::new()?.into_drive();
