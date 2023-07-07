@@ -2,7 +2,7 @@ use std::error::Error;
 
 pub trait FileMetadata {
     type File;
-    fn create<Body: Into<String>>(
+    fn create<Body: Into<Vec<u8>>>(
         &self,
         name: &str,
         content_type: &str,

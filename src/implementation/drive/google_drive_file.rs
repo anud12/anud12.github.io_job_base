@@ -130,13 +130,13 @@ impl FileMetadata for GoogleDriveFile {
         Ok(())
     }
 
-    fn create<Body: Into<String>>(
+    fn create<Body: Into<Vec<u8>>>(
         &self,
         name: &str,
         content_type: &str,
         body: Body,
     ) -> Result<GoogleDriveFile, Box<dyn Error>> {
-        let form_data: String = body.into();
+        let form_data: Vec<u8> = body.into();
 
         let id_token = self.session.clone().token;
 
@@ -156,7 +156,7 @@ impl FileMetadata for GoogleDriveFile {
             .set("Authorization", &format!("Bearer {}", id_token))
             .set("Content-Type", content_type)
             .set("Content-Length", &form_data.len().to_string())
-            .send_string(&form_data)?;
+            .send_bytes(&form_data)?;
 
         let json: serde_json::Value = put_req.into_json()?;
         self.find_one_by_id(json.get("id").map(|f| f.as_str()).unwrap().unwrap())
