@@ -2,7 +2,9 @@ mod api;
 mod implementation;
 mod printable;
 
-pub use crate::api::db::{IntoTable, Table, TableRow};
+pub use crate::api::db::IntoTable;
+pub use crate::api::db::Table;
+pub use crate::api::db::TableRow;
 pub use crate::api::file::FileMetadata;
 pub use crate::api::file::FileQuery;
 pub use crate::implementation::google_session::GoogleSession;
