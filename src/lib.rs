@@ -25,7 +25,7 @@ pub trait DecodeBase64 {
 }
 impl DecodeBase64 for String {
     fn decode_base64(&self) -> Result<Vec<u8>, Box<dyn Error>> {
-        match general_purpose::STANDARD.decode(self) {
+        match general_purpose::URL_SAFE.decode(self) {
             Ok(value) => Ok(value),
             Err(e) => Err(Box::new(e)),
         }
