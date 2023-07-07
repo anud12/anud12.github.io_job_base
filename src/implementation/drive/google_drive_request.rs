@@ -1,12 +1,10 @@
 use std::error::Error;
 
-use crate::PostPrintable;
-
 use super::google_drive_file::FileData;
 
 pub fn prepare_request(
     token: String,
-    arguments: crate::api::file::Request,
+    arguments: crate::api::file::RequestList,
 ) -> Result<Vec<FileData>, Box<dyn Error>> {
     let mut vec: Vec<String> = vec![];
 
@@ -28,7 +26,6 @@ pub fn prepare_request(
         Some(value) => value.to_string(),
         None => return Err(format!("files value does not exist on body {:?}", body).into()),
     };
-    files_string.print("Files string");
     let file_list: Vec<FileData> = serde_json::from_str(&files_string)?;
 
     Ok(file_list)

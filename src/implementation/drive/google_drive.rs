@@ -1,7 +1,10 @@
-use crate::{api::file::RootQuery, GoogleSession};
+use crate::{api::file::RequestOne, FileQuery, GoogleSession};
 use std::error::Error;
 
-use super::{google_drive_file::GoogleDriveFile, google_drive_request::prepare_request};
+use super::{
+    google_drive_file::GoogleDriveFile, google_drive_query::google_drive_query,
+    google_drive_query_one::google_drive_query_one,
+};
 
 #[derive(Debug)]
 pub struct GoogleDrive {
@@ -12,16 +15,15 @@ impl GoogleDrive {
         GoogleDrive { session }
     }
 }
-impl RootQuery<GoogleDriveFile> for GoogleDrive {
-    fn query(
+impl FileQuery<GoogleDriveFile> for GoogleDrive {
+    fn query_list(
         &self,
-        query_request: crate::api::file::Request,
+        query_request: crate::api::file::RequestList,
     ) -> Result<Vec<GoogleDriveFile>, Box<dyn Error>> {
-        let file_list = prepare_request(self.session.token.clone(), query_request)?;
-        let file_list = file_list
-            .iter()
-            .map(|file| GoogleDriveFile::new(self.session.clone(), file.clone()))
-            .collect();
-        Ok(file_list)
+        google_drive_query(&self.session, query_request)
+    }
+
+    fn query_one(&self, query_request: RequestOne) -> Result<GoogleDriveFile, Box<dyn Error>> {
+        google_drive_query_one(&self.session, query_request)
     }
 }
