@@ -7,11 +7,14 @@ pub use crate::api::db::Table;
 pub use crate::api::db::TableRow;
 pub use crate::api::file::FileMetadata;
 pub use crate::api::file::FileQuery;
-pub use crate::implementation::google_session::GoogleSession;
 pub use crate::printable::PostPrintable;
 pub use crate::printable::PrintableAnd;
 pub use serde;
 pub use serde_json;
+
+pub use crate::implementation::drive::google_drive::GoogleDrive;
+pub use crate::implementation::google_session::GoogleSession;
+pub use crate::implementation::sheet::Sheet;
 
 #[cfg(test)]
 mod tests_drive {
@@ -123,10 +126,11 @@ mod tests_drive {
 }
 
 mod tests_sheet {
-    use crate::{FileQuery, GoogleSession, IntoTable, Table, TableRow};
 
     #[test]
     fn sheet_works() -> Result<(), Box<dyn std::error::Error>> {
+        use crate::{FileQuery, GoogleSession, IntoTable, Table, TableRow};
+
         std::env::set_var("PRIVATE_KEY", include_str!("private_key"));
         std::env::set_var("CLIENT_EMAIL", include_str!("client_email"));
         let global_fs = GoogleSession::new()?.into_drive();

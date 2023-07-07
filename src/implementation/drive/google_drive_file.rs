@@ -1,7 +1,7 @@
 use crate::{api::file::FileMetadata, FileQuery, GoogleSession};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{error::Error, fmt::format};
+use std::error::Error;
 
 use super::{
     google_drive_query::google_drive_query, google_drive_query_one::google_drive_query_one,
