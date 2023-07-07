@@ -11,8 +11,6 @@ pub use crate::api::file::FileMetadata;
 pub use crate::api::file::FileQuery;
 pub use crate::printable::PostPrintable;
 pub use crate::printable::PrintableAnd;
-use base64::engine::general_purpose;
-use base64::Engine;
 pub use serde;
 pub use serde_json;
 
@@ -25,7 +23,7 @@ pub trait DecodeBase64 {
 }
 impl DecodeBase64 for String {
     fn decode_base64(&self) -> Result<Vec<u8>, Box<dyn Error>> {
-        match general_purpose::URL_SAFE.decode(self) {
+        match base64::decode(self) {
             Ok(value) => Ok(value),
             Err(e) => Err(Box::new(e)),
         }
