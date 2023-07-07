@@ -2,11 +2,14 @@ mod api;
 mod implementation;
 mod printable;
 
+pub use crate::api::db::{IntoTable, Table, TableRow};
 pub use crate::api::file::FileMetadata;
 pub use crate::api::file::FileQuery;
 pub use crate::implementation::google_session::GoogleSession;
 pub use crate::printable::PostPrintable;
 pub use crate::printable::PrintableAnd;
+pub use serde;
+pub use serde_json;
 
 #[cfg(test)]
 mod tests_drive {
