@@ -2,6 +2,8 @@ mod api;
 mod implementation;
 mod printable;
 
+use std::error::Error;
+
 pub use crate::api::db::IntoTable;
 pub use crate::api::db::Table;
 pub use crate::api::db::TableRow;
@@ -9,12 +11,26 @@ pub use crate::api::file::FileMetadata;
 pub use crate::api::file::FileQuery;
 pub use crate::printable::PostPrintable;
 pub use crate::printable::PrintableAnd;
+use base64::engine::general_purpose;
+use base64::Engine;
 pub use serde;
 pub use serde_json;
 
 pub use crate::implementation::drive::google_drive::GoogleDrive;
 pub use crate::implementation::google_session::GoogleSession;
 pub use crate::implementation::sheet::Sheet;
+
+pub trait DecodeBase64 {
+    fn decode_base64(&self) -> Result<Vec<u8>, Box<dyn Error>>;
+}
+impl DecodeBase64 for String {
+    fn decode_base64(&self) -> Result<Vec<u8>, Box<dyn Error>> {
+        match general_purpose::STANDARD.decode(self) {
+            Ok(value) => Ok(value),
+            Err(e) => Err(Box::new(e)),
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests_drive {
