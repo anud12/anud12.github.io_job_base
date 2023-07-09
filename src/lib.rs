@@ -91,7 +91,8 @@ mod tests_drive {
         let global_fs = GoogleSession::new()?.into_drive();
         let trash = global_fs.find_one_by_id("1d6SljhqtSuaLfIwVbxDGb2AI25PxgR1C")?;
         global_fs
-            .find_all_in("0AC35-q6SPyEbUk9PVA")
+            .find_one_by_id("0AC35-q6SPyEbUk9PVA")?
+            .find_all()
             .print_and("List")?
             .iter_mut()
             .for_each(|file| {
@@ -107,7 +108,8 @@ mod tests_drive {
         std::env::set_var("CLIENT_EMAIL", include_str!("client_email"));
         let global_fs = GoogleSession::new()?.into_drive();
         global_fs
-            .find_all_in("1YQPVPHBAX7q3sXevT7In2O-VTy9p8BH6")?
+            .find_one_by_id("1YQPVPHBAX7q3sXevT7In2O-VTy9p8BH6")?
+            .find_all()
             .print("Files: ");
         Ok(())
     }
@@ -119,13 +121,14 @@ mod tests_drive {
 
         let global_fs = session.into_drive();
         global_fs
-            .find_all_in("0AC35-q6SPyEbUk9PVA")
+            .find_one_by_id("0AC35-q6SPyEbUk9PVA")?
+            .find_all()
             .print_and("List")?
             .iter_mut()
             .for_each(|file| {
                 let url = format!(
                     "https://www.googleapis.com/drive/v3/files/{}",
-                    file.get_id()
+                    FileMetadata::get_id(file)
                 );
                 let agent = Agent::new();
                 agent

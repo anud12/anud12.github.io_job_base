@@ -26,4 +26,8 @@ impl FileQuery<GoogleDriveFile> for GoogleDrive {
     fn query_one(&self, query_request: RequestOne) -> Result<GoogleDriveFile, Box<dyn Error>> {
         google_drive_query_one(&self.session, query_request)
     }
+
+    fn get_id(&self) -> Option<String> {
+        None
+    }
 }

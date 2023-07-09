@@ -55,7 +55,10 @@ impl FileMetadata for GoogleDriveFile {
     }
 
     fn get_link(&self) -> String {
-        format!("https://drive.google.com/uc?id={}", self.get_id())
+        format!(
+            "https://drive.google.com/uc?id={}",
+            FileMetadata::get_id(self)
+        )
     }
 
     fn into_json(&self) -> Result<serde_json::Value, Box<dyn Error>> {
@@ -175,6 +178,10 @@ impl FileQuery<GoogleDriveFile> for GoogleDriveFile {
         query_request: crate::api::file::RequestOne,
     ) -> Result<GoogleDriveFile, Box<dyn Error>> {
         google_drive_query_one(&self.session, query_request)
+    }
+
+    fn get_id(&self) -> Option<String> {
+        Some(FileMetadata::get_id(self))
     }
 }
 
