@@ -36,15 +36,21 @@ pub fn google_drive_query_one(
     };
     if let Some(value) = query_request.name {
         if value != file.name {
-            return Err(format!("query_one file returned mismatched name: {}", value).into());
+            return Err(format!(
+                "query_one file returned mismatched name: {} {:?}",
+                value, file
+            )
+            .into());
         }
     }
     if let Some(value) = query_request.parent {
         if let Some(parents) = file.parents.clone() {
             if let Ok(_) = parents.binary_search(&value) {
-                return Err(
-                    format!("query_one file returned mistmatched parents: {}", value).into(),
-                );
+                return Err(format!(
+                    "query_one file returned mistmatched parents: {} {:?}",
+                    value, file
+                )
+                .into());
             }
         }
     }
