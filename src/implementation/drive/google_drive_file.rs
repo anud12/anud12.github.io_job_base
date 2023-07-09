@@ -181,7 +181,7 @@ impl FileQuery<GoogleDriveFile> for GoogleDriveFile {
     }
 
     fn get_id(&self) -> Option<String> {
-        Some(FileMetadata::get_id(self))
+        Some(self.file_data.id.clone())
     }
 }
 
