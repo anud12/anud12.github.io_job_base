@@ -36,12 +36,16 @@ pub fn google_drive_query_one(
     };
     if let Some(value) = query_request.name {
         if value != file.name {
-            return Err(format!("query_one file not found with name {}", value).into());
+            return Err(format!("query_one file returned mismatched name: {}", value).into());
         }
     }
     if let Some(value) = query_request.parent {
-        if value != file.name {
-            return Err(format!("query_one file not found with parent {}", value).into());
+        if let Some(parents) = file.parents.clone() {
+            if let Ok(_) = parents.binary_search(&value) {
+                return Err(
+                    format!("query_one file returned mistmatched parents: {}", value).into(),
+                );
+            }
         }
     }
     Ok(GoogleDriveFile::new(session.clone(), file.clone()))
