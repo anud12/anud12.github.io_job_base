@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{api::file::RequestOne, FileQuery, GoogleSession};
 use std::error::Error;
 
@@ -20,10 +22,12 @@ impl FileQuery<GoogleDriveFile> for GoogleDrive {
         &self,
         query_request: crate::api::file::RequestList,
     ) -> Result<Vec<GoogleDriveFile>, Box<dyn Error>> {
+        info!("query_list {:?}", query_request);
         google_drive_query(&self.session, query_request)
     }
 
     fn query_one(&self, query_request: RequestOne) -> Result<GoogleDriveFile, Box<dyn Error>> {
+        info!("query_one {:?}", query_request);
         google_drive_query_one(&self.session, query_request)
     }
 

@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct RequestOne {
     pub name: Option<String>,
     pub id: Option<String>,

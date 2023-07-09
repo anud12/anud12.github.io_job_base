@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct RequestList {
     pub name: Option<String>,
     pub size: Option<usize>,
