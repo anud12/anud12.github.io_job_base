@@ -1,0 +1,30 @@
+{
+  "name": "anud12.github.io_job_base",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node src/test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anud12/anud12.github.io_job_base.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anud12/anud12.github.io_job_base/issues"
+  },
+  "homepage": "https://github.com/anud12/anud12.github.io_job_base#readme",
+  "dependencies": {
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/node": "^20.4.1",
+    "jsonwebtoken": "^9.0.1",
+    "node-fetch": "^2.6.12",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.6.4"
+  }
+}

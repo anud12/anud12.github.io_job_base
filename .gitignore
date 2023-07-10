@@ -1,4 +1,6 @@
 /target
+/node_modules
+package-lock.json
 /Cargo.lock
 /.idea
 /src/service_account.json
