@@ -1,5 +1,5 @@
 export type FileMetadata = {
-  create: <T extends FileMetadata>(name: string, contentType: string, body: any) => Promise<T>;
+  create: (name: string, contentType: string, body: any) => Promise<FileMetadata>;
   id: string;
   name: string;
   link: string;
