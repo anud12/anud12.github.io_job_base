@@ -5,7 +5,7 @@ import { RequestOne } from "../../file/RequestOne.type";
 import { FileMetadata } from "../../file/FileMetadata";
 import { GoogleSession } from "../GoogleSession";
 import { FileData, prepareRequest } from "./prepareRequest";
-import { Sheet, SheetTable } from "../sheet/sheet";
+import { GoogleSheet } from "../sheet/GoogleSheet";
 
 export const googleQueryList = async (googleSession: GoogleSession, request: RequestList): Promise<Array<GoogleDriveFile>> => {
   return (await prepareRequest(googleSession.token, request)).map((fileData) => new GoogleDriveFile(googleSession, fileData));
@@ -21,7 +21,8 @@ export const googleQueryOne = async (googleSession: GoogleSession, request: Requ
     fileData = await response.json()
   } else {
     const list = await prepareRequest(googleSession.token, {
-      ...request,
+      name:request.name,
+      parent: request.parent,
       size: 1
     })
     if (list.length !== 1) {
@@ -127,8 +128,8 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
     const json = await put_req.json();
     return this.findOneById(json.id);
   }
-  intoSheet = (): SheetTable => {
-    return new SheetTable(new Sheet(this.googleSession, this.id))
+  intoSheet = (): GoogleSheet => {
+    return new GoogleSheet(this.googleSession, this.fileData);
   }
 
 }

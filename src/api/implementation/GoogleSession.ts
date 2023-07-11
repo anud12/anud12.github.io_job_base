@@ -2,7 +2,6 @@ import FormData from "form-data";
 import jwt from "jsonwebtoken";
 import fetch from "node-fetch";
 import { GoogleDrive } from "./drive/GoogleDrive";
-import { Sheet } from "./sheet/sheet";
 export type GoogleSession = {
   token: string,
   expirationUnixSeconds: Date
@@ -59,7 +58,7 @@ export const newGoogleSession = async () => {
     constructor() {
     }
     intoDrive = (): GoogleDrive => {
-      return new GoogleDrive(this)
+      return new GoogleDrive(this as GoogleSession)
     };
 
   }

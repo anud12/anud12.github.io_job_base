@@ -1,8 +1,11 @@
 /target
+/lib
 /node_modules
 package-lock.json
+
 /Cargo.lock
 /.idea
+/.vscode
 /src/service_account.json
 /src/private_key
 /src/client_email

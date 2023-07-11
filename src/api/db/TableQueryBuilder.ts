@@ -32,6 +32,6 @@ export class TableQueryBuilder<IdType> {
     }
 
     async query(): Promise<TableRow<IdType>[]> {
-        return this.table.find_by_query(this.tableQuery);
+        return this.table.findByQuery(this.tableQuery);
     }
 }

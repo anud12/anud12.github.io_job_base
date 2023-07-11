@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
-import { Sheet } from "./sheet";
+import {GoogleSheet} from "./GoogleSheet";
 
-export async function persistedRows(sheet: Sheet, data: [number, string[]][]): Promise<void> {
+export async function newPersistedRows(sheet: GoogleSheet, data: [number, string[]][]): Promise<void> {
   const persistedData = data.map(([rowNumber, row]) => {
     const range = `Sheet1!${rowNumber + 1}:${rowNumber + 1}`;
 
@@ -20,7 +20,7 @@ export async function persistedRows(sheet: Sheet, data: [number, string[]][]): P
     responseDateTimeRenderOption: "FORMATTED_STRING",
   };
 
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheet.spreadsheet_id}/values:batchUpdate`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheet.fileData.id}/values:batchUpdate`;
 
   await fetch(url, {
     method: 'POST',

@@ -1,7 +1,6 @@
-import fetch from "node-fetch";
-import { FileQuery } from "../../file/FileQuery";
-import { GoogleSession } from "../GoogleSession";
-import { GoogleDriveFile, googleQueryList, googleQueryOne } from "./GoogleDriveFile";
+import {FileQuery} from "../../file/FileQuery";
+import {GoogleSession} from "../GoogleSession";
+import {GoogleDriveFile, googleQueryList, googleQueryOne} from "./GoogleDriveFile";
 
 export class GoogleDrive extends FileQuery<GoogleDriveFile> {
   constructor(private googleSession: GoogleSession) {
