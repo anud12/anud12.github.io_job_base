@@ -50,7 +50,7 @@ const getSession = async (): Promise<Pick<GoogleSession, "token" | "expirationUn
   }
 }
 
-export const newGoogleSession = async () => {
+export const newGoogleSession = async ():Promise<GoogleSession> => {
   const data = await getSession();
   return new class implements GoogleSession {
     token: string = data.token;
