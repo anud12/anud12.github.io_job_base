@@ -11,11 +11,11 @@ export type FileData = {
 export const prepareRequest = async (token: string, requestList: RequestList): Promise<Array<FileData>> => {
     let query: Array<string> = [];
     if (requestList.name) {
-        query = [...query, `name=${requestList.name}`];
+        query = [...query, `'name=${requestList.name}'`];
     }
 
     if (requestList.parent) {
-        query = [...query, `${requestList.name} in parents`];
+        query = [...query, `'${requestList.parent}' in parents`];
     }
 
     const queryString = query.join(" and ");

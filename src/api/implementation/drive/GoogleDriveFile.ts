@@ -59,7 +59,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
 
   bodyJson = async<Body>(): Promise<Body> => {
     console.log(`GoogleDriveFile.bodyJson()`);
-    const response = await fetch(`"https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
+    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
       }
@@ -69,7 +69,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
 
   bodyString = async (): Promise<string> => {
     console.log(`GoogleDriveFile.bodyString()`);
-    const response = await fetch(`"https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
+    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
       }
