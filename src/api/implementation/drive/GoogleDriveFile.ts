@@ -25,7 +25,7 @@ export const googleQueryOne = async (googleSession: GoogleSession, request: Requ
       parent: request.parent,
       size: 1
     })
-    if (list.length !== 1) {
+    if (list?.length !== 1) {
       throw "googleQueryOne returned list length different than 1"
     }
     fileData = list[0]
