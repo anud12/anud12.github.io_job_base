@@ -4,8 +4,4 @@ export type GoogleSession = {
     expirationUnixSeconds: Date;
     intoDrive: () => GoogleDrive;
 };
-export declare const newGoogleSession: () => Promise<{
-    token: string;
-    expirationUnixSeconds: Date;
-    intoDrive: () => GoogleDrive;
-}>;
+export declare const newGoogleSession: () => Promise<GoogleSession>;
