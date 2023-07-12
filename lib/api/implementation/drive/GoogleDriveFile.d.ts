@@ -15,7 +15,7 @@ export declare class GoogleDriveFile extends FileQuery<GoogleDriveFile> implemen
     name: string;
     constructor(googleSession: GoogleSession, fileData: FileData);
     bodyJson: <Body>() => Promise<Body>;
-    bodyString: () => Promise<String>;
+    bodyString: () => Promise<string>;
     moveTo: (fileMetadata: FileMetadata) => Promise<void>;
     rename: (name: string) => Promise<void>;
     create: (name: string, contentType: string, body: any) => Promise<FileMetadata>;
