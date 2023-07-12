@@ -8,9 +8,11 @@ import { FileData, prepareRequest } from "./prepareRequest";
 import { GoogleSheet } from "../sheet/GoogleSheet";
 
 export const googleQueryList = async (googleSession: GoogleSession, request: RequestList): Promise<Array<GoogleDriveFile>> => {
+  console.log(`googleQueryList(session, request:${request})`);
   return (await prepareRequest(googleSession.token, request)).map((fileData) => new GoogleDriveFile(googleSession, fileData));
 }
 export const googleQueryOne = async (googleSession: GoogleSession, request: RequestOne): Promise<GoogleDriveFile> => {
+  console.log(`googleQueryOne(session, request:${request})`);
   let fileData: FileData
   if (request.id) {
     const response = await fetch(`https://www.googleapis.com/drive/v3/files/${request.id}?fields=id, name, mimeType, parents`, {
