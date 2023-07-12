@@ -1,8 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: Run Services
-
+name: Build Js
 on:
 #  schedule:
 #    # * is a special character in YAML so you have to quote this string
@@ -24,7 +20,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18.x'
+        node-version: '16.x'
     - run: npm i
     - run: npm run build
 
