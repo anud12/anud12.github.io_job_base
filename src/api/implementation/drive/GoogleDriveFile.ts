@@ -31,11 +31,11 @@ export const googleQueryOne = async (googleSession: GoogleSession, request: Requ
     fileData = list[0]
   }
   if (request.parent && !fileData.parents?.includes(request.parent)) {
-    throw `googleQueryOne returned file has diferent parent than ${request.parent} : ${fileData}`
+    throw new Error(`googleQueryOne returned file has diferent parent than ${request.parent} : ${fileData}`);
   }
 
   if (request.name && fileData.name !== request.name) {
-    throw `googleQueryOne returned file has diferent name than ${request.name} : ${fileData}`
+    throw new Error(`googleQueryOne returned file has diferent name than ${request.name} : ${fileData}`);
   }
 
   return new GoogleDriveFile(googleSession, fileData);

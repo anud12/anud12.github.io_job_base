@@ -40,7 +40,7 @@ const getSession = async (): Promise<Pick<GoogleSession, "token" | "expirationUn
   const responseJson = (await response.json() as any);
   const access_token = responseJson.access_token;
   if (!access_token) {
-    throw `Response doesnt contain access token, response: ${JSON.stringify(responseJson, null, 2)}`
+    throw new Error(`Response doesnt contain access token, response: ${JSON.stringify(responseJson, null, 2)}`)
   }
 
 
