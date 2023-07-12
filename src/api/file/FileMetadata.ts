@@ -3,7 +3,7 @@ export type FileMetadata = {
   id: string;
   name: string;
   link: string;
-  bodyString: () => Promise<String>;
+  bodyString: () => Promise<string>;
   bodyJson: <Body>() => Promise<Body>;
   moveTo: (fileMetadata: FileMetadata) => Promise<void>;
   rename: (name: string) => Promise<void>;

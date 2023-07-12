@@ -64,7 +64,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
     return (await response.json()) as Body
   }
 
-  bodyString = async (): Promise<String> => {
+  bodyString = async (): Promise<string> => {
     const response = await fetch(`"https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
