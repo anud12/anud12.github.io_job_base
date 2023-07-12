@@ -56,6 +56,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
   }
 
   bodyJson = async<Body>(): Promise<Body> => {
+    console.log(`GoogleDriveFile.bodyJson()`);
     const response = await fetch(`"https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
@@ -65,6 +66,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
   }
 
   bodyString = async (): Promise<string> => {
+    console.log(`GoogleDriveFile.bodyString()`);
     const response = await fetch(`"https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
@@ -74,6 +76,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
   }
 
   moveTo = async (fileMetadata: FileMetadata): Promise<void> => {
+    console.log(`GoogleDriveFile.moveTo(fileMetadata:${fileMetadata.id})`);
     if (!this.fileData.parents) {
       throw "No parents found";
     }
@@ -86,6 +89,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
     return;
   }
   rename = async (name: string): Promise<void> => {
+    console.log(`GoogleDriveFile.rename(fileMetadata:${name})`);
     if (!this.fileData.parents) {
       throw "No parents found";
     }
@@ -101,6 +105,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
   }
 
   create = async (name: string, contentType: string, body: any): Promise<FileMetadata> => {
+    console.log(`GoogleDriveFile.create(name:${name}, contentType:${contentType}, body:${body})`);
     const resumable_req = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
       method: "POST",
       headers: {

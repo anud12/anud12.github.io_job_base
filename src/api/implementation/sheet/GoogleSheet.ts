@@ -19,6 +19,7 @@ export class GoogleSheet implements Table<number> {
   }
 
   async saveAll(data: TableRow<number>[]): Promise<void> {
+    console.log(`GoogleSheet.saveAll(data:${data})`);
     const columns = await getColumns(this);
     let columnMap: ColumnMap = columns.reduce((acc: ColumnMap, value: string, index: number) => {
       acc[value] = index;
@@ -58,6 +59,7 @@ export class GoogleSheet implements Table<number> {
   }
 
   async findByQuery(query: TableQuery): Promise<TableRow<number>[]> {
+    console.log(`GoogleSheet.findByQuery(query:${query})`);
     const columns = await getColumns(this);
     const data = await getRows(this, query);
 

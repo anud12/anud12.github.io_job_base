@@ -12,27 +12,31 @@ export class FileQuery<T> {
   }
 
   findAll = () => {
+    console.log(`FileQuery.findAll()`)
     return this.client.queryList({
       parent: this.client.getId()
     })
   }
 
-  findByName = (name:string) => {
+  findByName = (name: string) => {
+    console.log(`FileQuery.findAll(name:${name})`)
     return this.client.queryList({
-      parent:this.client.getId(),
+      parent: this.client.getId(),
       name
     })
   }
 
-  findOneByName = (name:string) => {
+  findOneByName = (name: string) => {
+    console.log(`FileQuery.findOneByName(name:${name})`);
     return this.client.queryOne({
-      parent:this.client.getId(),
+      parent: this.client.getId(),
       name
     })
   }
-  findOneById = (id:string) => {
+  findOneById = (id: string) => {
+    console.log(`FileQuery.findOneById(id:${id})`);
     return this.client.queryOne({
-      parent:this.client.getId(),
+      parent: this.client.getId(),
       id
     })
   }
