@@ -17,7 +17,7 @@ export declare class GoogleDriveFile extends FileQuery<GoogleDriveFile> implemen
     bodyJson: <Body>() => Promise<Body>;
     bodyString: () => Promise<string>;
     moveTo: (fileMetadata: FileMetadata) => Promise<void>;
-    rename: (name: string) => Promise<void>;
+    rename: (name: string) => Promise<unknown>;
     create: (name: string, contentType: string, body: any) => Promise<FileMetadata>;
     intoSheet: () => GoogleSheet;
 }

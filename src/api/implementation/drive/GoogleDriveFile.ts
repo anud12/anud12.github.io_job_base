@@ -1,11 +1,10 @@
-import fetch from "node-fetch";
-import { FileQuery } from "../../file/FileQuery";
-import { RequestList } from "../../file/RequestList.type";
-import { RequestOne } from "../../file/RequestOne.type";
-import { FileMetadata } from "../../file/FileMetadata";
-import { GoogleSession } from "../GoogleSession";
-import { FileData, prepareRequest } from "./prepareRequest";
-import { GoogleSheet } from "../sheet/GoogleSheet";
+import {FileQuery} from "../../file/FileQuery";
+import {RequestList} from "../../file/RequestList.type";
+import {RequestOne} from "../../file/RequestOne.type";
+import {FileMetadata} from "../../file/FileMetadata";
+import {GoogleSession} from "../GoogleSession";
+import {FileData, prepareRequest} from "./prepareRequest";
+import {GoogleSheet} from "../sheet/GoogleSheet";
 import {fetchGoogle} from "../fetchGoogle";
 
 export const googleQueryList = async (googleSession: GoogleSession, request: RequestList): Promise<Array<GoogleDriveFile>> => {
@@ -89,6 +88,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
         "Authorization": `Bearer ${this.googleSession.token}`
       }
     })
+    return
   }
   rename = async (name: string): Promise<unknown> => {
     console.log(`GoogleDriveFile.rename(fileMetadata:${name})`);
@@ -104,6 +104,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
         name: name
       })
     })
+    return;
   }
 
   create = async (name: string, contentType: string, body: any): Promise<FileMetadata> => {

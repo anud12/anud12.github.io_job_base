@@ -1,6 +1,6 @@
-import fetch from "node-fetch";
+import fetch, {Response} from "node-fetch";
 
-export const fetchGoogle = <T = any>(...args:Parameters<typeof fetch>):Promise<T> => {
+export const fetchGoogle = (...args:Parameters<typeof fetch>):Promise<Response> => {
   return new Promise(async (resolve, reject) => {
     const response = await fetch(args[0], {
       ...args[1],
