@@ -1,6 +1,4 @@
-import fetch from "node-fetch";
-import { RequestList } from "../../file/RequestList.type";
-import * as repl from "repl";
+import {RequestList} from "../../file/RequestList.type";
 import {fetchGoogle} from "../fetchGoogle";
 
 export type FileData = {
