@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import {GoogleSheet} from "./GoogleSheet";
+import {fetchGoogle} from "../fetchGoogle";
 
 export async function newPersistedRows(sheet: GoogleSheet, data: [number, string[]][]): Promise<void> {
   const persistedData = data.map(([rowNumber, row]) => {
@@ -22,7 +23,7 @@ export async function newPersistedRows(sheet: GoogleSheet, data: [number, string
 
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheet.fileData.id}/values:batchUpdate`;
 
-  await fetch(url, {
+  await fetchGoogle(url, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${sheet.session.token}`,

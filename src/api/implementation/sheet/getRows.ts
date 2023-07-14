@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import {parseResponse} from "./parseResponse";
 import {GoogleSheet} from "./GoogleSheet";
 import {TableQuery} from "../../db/TableQuery";
+import {fetchGoogle} from "../fetchGoogle";
 
 export const getRows = async (sheet: GoogleSheet, query: TableQuery): Promise<[number, string[]][]> => {
   const query_skip = query.skip || 1;
@@ -11,7 +12,7 @@ export const getRows = async (sheet: GoogleSheet, query: TableQuery): Promise<[n
     : url;
 
   const urlWithDimension = `${urlWithSize}?majorDimension=ROWS`;
-  const response = await fetch(urlWithDimension, {
+  const response = await fetchGoogle(urlWithDimension, {
     headers: {
       Authorization: `Bearer ${sheet.session.token}`,
     },

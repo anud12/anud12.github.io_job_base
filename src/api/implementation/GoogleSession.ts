@@ -1,13 +1,12 @@
 import FormData from "form-data";
 import jwt from "jsonwebtoken";
-import fetch from "node-fetch";
 import { GoogleDrive } from "./drive/GoogleDrive";
+import {fetchGoogle} from "./fetchGoogle";
 export type GoogleSession = {
   token: string,
   expirationUnixSeconds: Date
   intoDrive: () => GoogleDrive
 }
-
 const getSession = async (): Promise<Pick<GoogleSession, "token" | "expirationUnixSeconds">> => {
   const privateKey = process.env.PRIVATE_KEY;
   if (!privateKey) {
@@ -33,7 +32,7 @@ const getSession = async (): Promise<Pick<GoogleSession, "token" | "expirationUn
   const body = new FormData();
   body.append("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
   body.append("assertion", token);
-  const response = await fetch("https://oauth2.googleapis.com/token", {
+  const response = await fetchGoogle("https://oauth2.googleapis.com/token", {
     method: "POST",
     body: body
   })

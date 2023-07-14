@@ -6,6 +6,7 @@ import { FileMetadata } from "../../file/FileMetadata";
 import { GoogleSession } from "../GoogleSession";
 import { FileData, prepareRequest } from "./prepareRequest";
 import { GoogleSheet } from "../sheet/GoogleSheet";
+import {fetchGoogle} from "../fetchGoogle";
 
 export const googleQueryList = async (googleSession: GoogleSession, request: RequestList): Promise<Array<GoogleDriveFile>> => {
   console.log(`googleQueryList(session, request:${JSON.stringify(request)})`);
@@ -15,7 +16,7 @@ export const googleQueryOne = async (googleSession: GoogleSession, request: Requ
   console.log(`googleQueryOne(session, request:${JSON.stringify(request)})`);
   let fileData: FileData
   if (request.id) {
-    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${request.id}?fields=id, name, mimeType, parents`, {
+    const response = await fetchGoogle(`https://www.googleapis.com/drive/v3/files/${request.id}?fields=id, name, mimeType, parents`, {
       method: "GET", headers: {
         "Authorization": `Bearer ${googleSession.token}`
       }
@@ -59,7 +60,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
 
   bodyJson = async<Body>(): Promise<Body> => {
     console.log(`GoogleDriveFile.bodyJson()`);
-    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
+    const response = await fetchGoogle(`https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
       }
@@ -69,7 +70,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
 
   bodyString = async (): Promise<string> => {
     console.log(`GoogleDriveFile.bodyString()`);
-    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
+    const response = await fetchGoogle(`https://www.googleapis.com/drive/v3/files/${this.fileData.id}?alt=media`, {
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
       }
@@ -82,20 +83,19 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
     if (!this.fileData.parents) {
       throw "No parents found";
     }
-    fetch(`https://www.googleapis.com/upload/drive/v3/files/${this.id}?removeParents=${this.fileData.parents[0]}&addParents=${fileMetadata.id}`, {
+    await fetchGoogle(`https://www.googleapis.com/upload/drive/v3/files/${this.id}?removeParents=${this.fileData.parents[0]}&addParents=${fileMetadata.id}`, {
       method: "PATCH",
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
       }
     })
-    return;
   }
-  rename = async (name: string): Promise<void> => {
+  rename = async (name: string): Promise<unknown> => {
     console.log(`GoogleDriveFile.rename(fileMetadata:${name})`);
     if (!this.fileData.parents) {
       throw "No parents found";
     }
-    fetch(`https://www.googleapis.com/upload/drive/v3/files/${this.id}}`, {
+    await fetchGoogle(`https://www.googleapis.com/upload/drive/v3/files/${this.id}}`, {
       method: "PATCH",
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`
@@ -108,7 +108,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
 
   create = async (name: string, contentType: string, body: any): Promise<FileMetadata> => {
     console.log(`GoogleDriveFile.create(name:${name}, contentType:${contentType}, body:${body})`);
-    const resumable_req = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
+    const resumable_req = await fetchGoogle("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`,
@@ -123,7 +123,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
 
     const location = resumable_req.headers.get("Location")!;
 
-    const put_req = await fetch(location, {
+    const put_req = await fetchGoogle(location, {
       method: "PUT",
       headers: {
         "Authorization": `Bearer ${this.googleSession.token}`,

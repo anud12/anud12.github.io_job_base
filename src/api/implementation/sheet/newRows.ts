@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import {GoogleSheet} from "./GoogleSheet";
+import {fetchGoogle} from "../fetchGoogle";
 
 export async function newRows(sheet: GoogleSheet, data: string[][]): Promise<void> {
   if (data.length > 0) {
@@ -11,7 +12,7 @@ export async function newRows(sheet: GoogleSheet, data: string[][]): Promise<voi
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheet.fileData.id}/values/Sheet1:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS&includeValuesInResponse=false&responseValueRenderOption=UNFORMATTED_VALUE&responseDateTimeRenderOption=FORMATTED_STRING`;
 
-    await fetch(url, {
+    await fetchGoogle(url, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${sheet.session.token}`,
