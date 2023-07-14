@@ -108,7 +108,7 @@ export class GoogleDriveFile extends FileQuery<GoogleDriveFile> implements FileM
   }
 
   create = async (name: string, contentType: string, body: any): Promise<FileMetadata> => {
-    console.log(`GoogleDriveFile.create(name:${name}, contentType:${contentType}, body:${body})`);
+    console.log(`GoogleDriveFile.create(name:${name}, contentType:${contentType}`);
     const resumable_req = await fetchGoogle("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
       method: "POST",
       headers: {
