@@ -11,6 +11,6 @@ export const fetchGoogle = (...args:Parameters<typeof fetch>):Promise<Response> 
         return;
       }
       resolve(response);
-    }, 500);
+    }, 100);
   })
 }
