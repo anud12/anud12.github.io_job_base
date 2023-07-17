@@ -1,5 +1,5 @@
-import {RequestList} from "./RequestList.type";
-import {RequestOne} from "./RequestOne.type";
+import { RequestList } from "./RequestList.type";
+import { RequestOne } from "./RequestOne.type";
 
 export type FileQueryClient<T> = {
   queryList: (request: RequestList) => Promise<Array<T>>;
@@ -7,9 +7,11 @@ export type FileQueryClient<T> = {
   getId: () => string | undefined
 }
 
-export class FileQuery<T> {
-  constructor(private client: FileQueryClient<T>) {
+export abstract class FileQuery<T, TUninitialized> {
+  constructor(protected client: FileQueryClient<T>) {
   }
+
+  abstract findOneByIdLazy: (id:string) => TUninitialized;
 
   findAll = () => {
     return this.client.queryList({
@@ -30,6 +32,7 @@ export class FileQuery<T> {
       name
     })
   }
+
   findOneById = (id: string) => {
     return this.client.queryOne({
       parent: this.client.getId(),

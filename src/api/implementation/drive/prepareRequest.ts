@@ -1,14 +1,8 @@
-import {RequestList} from "../../file/RequestList.type";
-import {fetchGoogle} from "../fetchGoogle";
+import { RequestList } from "../../file/RequestList.type";
+import { fetchGoogle } from "../fetchGoogle";
+import { GoogleDriveFileData } from "./GoogleDriveFileData";
 
-export type FileData = {
-    id: string,
-    name: string,
-    mimeType: string,
-    parents?: Array<string>,
-}
-
-export const prepareRequest = async (token: string, requestList: RequestList): Promise<Array<FileData>> => {
+export const prepareRequest = async (token: string, requestList: RequestList): Promise<Array<GoogleDriveFileData>> => {
     let query: Array<string> = [];
     if (requestList.name) {
         query = [...query, `name='${requestList.name}'`];

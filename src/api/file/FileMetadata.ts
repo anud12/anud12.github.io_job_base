@@ -1,4 +1,7 @@
+import { FileMetadataUninitialized } from "./FileMetadataUninitialized";
+
 export type FileMetadata = {
+  createLazy: (name: string, contentType: string, body: any) => Promise<FileMetadataUninitialized>;
   create: (name: string, contentType: string, body: any) => Promise<FileMetadata>;
   id: string;
   name: string;

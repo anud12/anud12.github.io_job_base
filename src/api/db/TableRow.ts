@@ -1,6 +1,4 @@
-type Data = Record<string, string>;
-
-export type TableRow<IdType> = {
+export type TableRow<IdType, DataType = any> = {
     id: IdType | undefined;
-    data: Data;
+    data: DataType;
 }
