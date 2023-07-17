@@ -11,7 +11,7 @@ export class GoogleDriveFile extends GoogleDriveFileUninitialized implements Fil
   link: string;
   name: string;
 
-  constructor(private googleSession: GoogleSession, private fileData: GoogleDriveFileData) {
+  constructor(protected googleSession: GoogleSession, private fileData: GoogleDriveFileData) {
     super(googleSession, fileData.id);
     this.id = fileData.id;
     this.name = fileData.name;

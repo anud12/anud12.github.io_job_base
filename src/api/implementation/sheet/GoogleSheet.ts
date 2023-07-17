@@ -95,15 +95,15 @@ function transform(row: TableRow<number>, column_map: ColumnMap): [string[], Col
   const existing_rows_list: string[] = Array(column_map.length).fill('');
 
   const data = { ...row.data };
-  for (const [key, value]:[string,string] of Object.entries(data)) {
+  for (const [key, value] of Object.entries(data)) {
     if(value === undefined) {
       continue;
     }
     if (column_map[key] === undefined) {
       column_map[key] = Object.keys(column_map).length;
-      existing_rows_list.push(value);
+      existing_rows_list.push(value as unknown as string);
     } else {
-      existing_rows_list[column_map[key]] = value;
+      existing_rows_list[column_map[key]] = value as unknown as string;
       delete data[key];
     }
   }

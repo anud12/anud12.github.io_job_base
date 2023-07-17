@@ -54,7 +54,7 @@ export class GoogleDrive extends FileQuery<GoogleDriveFile, GoogleDriveFileUnini
     });
   }
 
-  findOneByIdLazy(id: string): GoogleDriveFileUninitialized {
+  findOneByIdLazy = (id: string): GoogleDriveFileUninitialized => {
     console.log(`GoogleDrive.findOneByIdLazy(id:${JSON.stringify(id)})`);
 
     return new GoogleDriveFileUninitialized(this.googleSession, id);

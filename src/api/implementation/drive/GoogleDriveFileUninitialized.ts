@@ -6,9 +6,8 @@ import {FileQuery} from "../../file/FileQuery";
 import {GoogleDriveFile} from "./GoogleDriveFile";
 
 export class GoogleDriveFileUninitialized extends FileQuery<GoogleDriveFile, GoogleDriveFileUninitialized> implements FileMetadataUninitialized {
-  id: string;
 
-  constructor(protected googleSession: GoogleSession, private id: string) {
+  constructor(protected googleSession: GoogleSession, public id: string) {
     super({
       getId: () => id,
       queryList: (request) => googleQueryList(this.googleSession, request),
@@ -22,7 +21,7 @@ export class GoogleDriveFileUninitialized extends FileQuery<GoogleDriveFile, Goo
     })
   }
 
-  findOneByIdLazy(id: string): GoogleDriveFileUninitialized {
+  findOneByIdLazy = (id: string): GoogleDriveFileUninitialized => {
     return new GoogleDriveFileUninitialized(this.googleSession, id);
   }
 }
